@@ -5,11 +5,12 @@ import LoginPage from './src/pages/LoginPage';
 import WorkspaceSelectorPage from './src/pages/WorkspaceSelectorPage';
 import KanbanBoardPage from './pages/KanbanBoardPage';
 import ReportsPage from './pages/ReportsPage';
+import JiraIntegrationDemoPage from './pages/JiraIntegrationDemoPage';
 import Avatar from './components/ui/Avatar';
 import AIAssistant from './components/ui/AIAssistant';
 import NotesSystem from './components/ui/NotesSystem';
 import { mockTasks, mockSprints } from './data/mockData';
-import { AreaChart, KanbanSquare, LogOut, ArrowLeft, BookOpen } from 'lucide-react';
+import { AreaChart, KanbanSquare, LogOut, ArrowLeft, BookOpen, Settings } from 'lucide-react';
 
 const App: React.FC = () => {
   return (
@@ -54,6 +55,7 @@ const AppContent: React.FC = () => {
         <Route path="/workspaces" element={<WorkspaceSelectorPage />} />
         <Route path="/workspace/:workspaceId" element={<WorkspaceLayout />} />
         <Route path="/workspace/:workspaceId/reports" element={<WorkspaceLayout />} />
+        <Route path="/jira-integration" element={<JiraIntegrationDemoPage />} />
       </Routes>
     </div>
   );

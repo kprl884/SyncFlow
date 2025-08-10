@@ -4,7 +4,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { Workspace } from '../../types';
-import { Plus, Users, Calendar, LogOut } from 'lucide-react';
+import { Plus, Users, Calendar, LogOut, Settings } from 'lucide-react';
 
 interface CreateWorkspaceModalProps {
   onClose: () => void;
@@ -167,14 +167,23 @@ const WorkspaceSelectorPage: React.FC = () => {
                 Hoş geldin, {currentUser?.displayName || 'Kullanıcı'}
               </p>
             </div>
-            <button 
-              onClick={signOutUser} 
-              className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 font-medium" 
-              aria-label="Çıkış Yap"
-            >
-              <LogOut className="h-4 w-4" />
-              <span>Çıkış Yap</span>
-            </button>
+            <div className="flex items-center space-x-4">
+              <a
+                href="/jira-integration"
+                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 font-medium"
+              >
+                <Settings className="h-4 w-4" />
+                <span>Jira Entegrasyonu</span>
+              </a>
+              <button 
+                onClick={signOutUser} 
+                className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 font-medium" 
+                aria-label="Çıkış Yap"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Çıkış Yap</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
