@@ -15,3 +15,13 @@ export const PRIORITY_COLORS: Record<string, string> = {
   Medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
   Low: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
 };
+
+export const DEFAULT_TAGS: string[] = [
+  'ios',
+  'android',
+  'frontend',
+  'backend',
+  'test',
+  'design',
+  'analist'
+];

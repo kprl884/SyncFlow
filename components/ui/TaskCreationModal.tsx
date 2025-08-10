@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Minus, Users, Tag, Calendar, AlertCircle, CheckCircle, Clock, Zap } from 'lucide-react';
+import { X, Plus, Minus, Users, Tag, Calendar, AlertCircle, CheckCircle, Clock, Zap, Sparkles } from 'lucide-react';
 import type { Task, User, Team } from '../../types';
-import { TASK_STATUSES, TEAM_COLORS } from '../../constants';
+import { TASK_STATUSES, TEAM_COLORS, DEFAULT_TAGS } from '../../constants';
+import { aiService, type AITaskDescriptionResponse } from '../../src/lib/ai-service';
 
 interface TaskCreationModalProps {
   isOpen: boolean;
@@ -44,6 +45,10 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
   const [newTag, setNewTag] = useState('');
   const [showSPHelper, setShowSPHelper] = useState(false);
   const [spRecommendation, setSpRecommendation] = useState<number | null>(null);
+  
+  // AI Co-pilot states
+  const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
+  const [acceptanceCriteria, setAcceptanceCriteria] = useState<string[]>([]);
 
   useEffect(() => {
     if (isOpen) {
@@ -135,6 +140,31 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
     }));
   };
 
+  const generateWithCoPilot = async () => {
+    if (!formData.title.trim()) {
+      alert('Lütfen önce task başlığını girin.');
+      return;
+    }
+
+    setIsGeneratingDescription(true);
+    try {
+      const result = await aiService.generateTaskDescription(formData.title);
+      
+      setFormData(prev => ({
+        ...prev,
+        description: result.userStory
+      }));
+      
+      setAcceptanceCriteria(result.acceptanceCriteria);
+      
+    } catch (error) {
+      console.error('Co-pilot hatası:', error);
+      alert('Co-pilot şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.');
+    } finally {
+      setIsGeneratingDescription(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -167,6 +197,15 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 placeholder="Task başlığını girin..."
                 required
               />
+              <button
+                type="button"
+                onClick={generateWithCoPilot}
+                disabled={isGeneratingDescription || !formData.title.trim()}
+                className="mt-2 flex items-center space-x-2 px-3 py-2 text-sm bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span>{isGeneratingDescription ? 'Oluşturuluyor...' : 'Generate with Co-pilot ✨'}</span>
+              </button>
             </div>
 
             <div>
@@ -197,6 +236,23 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Task açıklamasını girin..."
             />
+            
+            {/* Acceptance Criteria from Co-pilot */}
+            {acceptanceCriteria.length > 0 && (
+              <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+                  ✨ Co-pilot Kabul Kriterleri:
+                </h4>
+                <ul className="space-y-1">
+                  {acceptanceCriteria.map((criteria, index) => (
+                    <li key={index} className="text-sm text-blue-700 dark:text-blue-300 flex items-start">
+                      <span className="text-blue-500 mr-2">•</span>
+                      {criteria}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
 
           {/* Team and Priority */}
@@ -387,6 +443,37 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Etiketler
             </label>
+            
+            {/* Default Tags */}
+            <div className="mb-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">Hazır etiketler:</p>
+              <div className="flex flex-wrap gap-2">
+                {DEFAULT_TAGS.map(tag => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => {
+                      if (!formData.tags.includes(tag)) {
+                        setFormData(prev => ({
+                          ...prev,
+                          tags: [...prev.tags, tag]
+                        }));
+                      }
+                    }}
+                    disabled={formData.tags.includes(tag)}
+                    className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                      formData.tags.includes(tag)
+                        ? 'bg-indigo-600 text-white cursor-not-allowed'
+                        : 'bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-500'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Custom Tag Input */}
             <div className="flex space-x-2 mb-2">
               <input
                 type="text"
@@ -394,7 +481,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 onChange={(e) => setNewTag(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                 className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                placeholder="Etiket ekleyin..."
+                placeholder="Özel etiket ekleyin..."
               />
               <button
                 type="button"
@@ -404,23 +491,28 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
                 <Plus className="h-4 w-4" />
               </button>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.tags.map(tag => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center space-x-1 px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 rounded-full text-sm"
-                >
-                  <span>{tag}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeTag(tag)}
-                    className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+
+            {/* Selected Tags */}
+            {formData.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400 w-full mb-2">Seçilen etiketler:</p>
+                {formData.tags.map(tag => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center space-x-1 px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 rounded-full text-sm"
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
+                    <span>{tag}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Dependencies */}

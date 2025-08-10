@@ -284,8 +284,8 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
             onEnd={endStandup}
           />
         )}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-shrink-0">
-          <div className="flex-1">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-start flex-shrink-0">
+          <div className="flex-1 max-w-2xl">
             <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
               {isStandupModeActive && standupTeam ? `${standupTeam} Stand-up` : workspace?.name || "SyncFlow Board"}
             </h1>
@@ -312,7 +312,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
               </div>
             )}
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-3 mt-4 ml-6">
             {!isStandupModeActive && (
               <>
                 <button
