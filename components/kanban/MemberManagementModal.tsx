@@ -91,7 +91,23 @@ const MemberManagementModal: React.FC<MemberManagementModalProps> = ({
       onMembersUpdated();
     } catch (error) {
       console.error('Error inviting user:', error);
-      setInviteError('Kullanıcı davet edilirken bir hata oluştu.');
+      
+      let errorMessage = 'Kullanıcı davet edilirken bir hata oluştu.';
+      
+      // Daha spesifik hata mesajları
+      if (error instanceof Error) {
+        if (error.message.includes('permission') || error.message.includes('permissions')) {
+          errorMessage = 'Bu işlem için yetkiniz bulunmuyor. Admin olarak giriş yapın.';
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = 'İnternet bağlantınızı kontrol edin ve tekrar deneyin.';
+        } else if (error.message.includes('quota') || error.message.includes('limit')) {
+          errorMessage = 'Firebase limiti aşıldı. Lütfen daha sonra tekrar deneyin.';
+        } else if (error.message.includes('invalid-email')) {
+          errorMessage = 'Geçersiz email formatı. Lütfen doğru email adresini girin.';
+        }
+      }
+      
+      setInviteError(errorMessage);
     } finally {
       setIsInviting(false);
     }

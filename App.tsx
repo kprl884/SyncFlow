@@ -6,7 +6,10 @@ import WorkspaceSelectorPage from './src/pages/WorkspaceSelectorPage';
 import KanbanBoardPage from './pages/KanbanBoardPage';
 import ReportsPage from './pages/ReportsPage';
 import Avatar from './components/ui/Avatar';
-import { AreaChart, KanbanSquare, LogOut, ArrowLeft } from 'lucide-react';
+import AIAssistant from './components/ui/AIAssistant';
+import NotesSystem from './components/ui/NotesSystem';
+import { mockTasks, mockSprints } from './data/mockData';
+import { AreaChart, KanbanSquare, LogOut, ArrowLeft, BookOpen } from 'lucide-react';
 
 const App: React.FC = () => {
   return (
@@ -30,13 +33,19 @@ const LoadingSpinner: React.FC = () => (
 const AppContent: React.FC = () => {
   const { currentUser, loading, signOutUser } = useAuth();
 
+  console.log('AppContent: Auth state:', { currentUser: currentUser?.uid, loading });
+
   if (loading) {
+    console.log('AppContent: Showing loading spinner');
     return <LoadingSpinner />;
   }
 
   if (!currentUser) {
+    console.log('AppContent: No user, showing login page');
     return <LoginPage />;
   }
+
+  console.log('AppContent: User authenticated, showing main app');
 
   return (
     <div className="flex flex-col h-screen text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">
@@ -54,7 +63,7 @@ const WorkspaceLayout: React.FC = () => {
   const { currentUser, signOutUser } = useAuth();
   const { workspaceId } = useParams();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState<'board' | 'reports'>('board');
+  const [currentPage, setCurrentPage] = useState<'board' | 'reports' | 'notes'>('board');
 
   const navItemClasses = "flex items-center space-x-2 px-4 py-2 rounded-md transition-colors duration-200 cursor-pointer";
   const activeNavItemClasses = "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-50";
@@ -85,11 +94,20 @@ const WorkspaceLayout: React.FC = () => {
                 <AreaChart className="h-5 w-5" />
                 <span>Reports</span>
               </div>
+              <div onClick={() => setCurrentPage('notes')} className={`${navItemClasses} ${currentPage === 'notes' ? activeNavItemClasses : inactiveNavItemClasses}`}>
+                <BookOpen className="h-5 w-5" />
+                <span>Notlar</span>
+              </div>
             </nav>
             <div className="flex items-center space-x-3">
                <Avatar user={{ id: currentUser.uid, name: currentUser.displayName || 'User', avatarUrl: currentUser.photoURL || undefined }} />
-               <button onClick={signOutUser} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" aria-label="Sign out">
-                   <LogOut className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+               <button 
+                 onClick={signOutUser} 
+                 className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors duration-200 font-medium" 
+                 aria-label="Sign out"
+               >
+                   <LogOut className="h-4 w-4" />
+                   <span>Çıkış Yap</span>
                </button>
             </div>
         </div>
@@ -97,7 +115,11 @@ const WorkspaceLayout: React.FC = () => {
       <main className="flex-grow overflow-hidden">
         {currentPage === 'board' && <KanbanBoardPage workspaceId={workspaceId} />}
         {currentPage === 'reports' && <ReportsPage workspaceId={workspaceId} />}
+        {currentPage === 'notes' && <NotesSystem workspaceId={workspaceId} tasks={mockTasks} sprints={mockSprints} />}
       </main>
+      
+      {/* AI Assistant */}
+      <AIAssistant workspaceId={workspaceId} />
     </>
   );
 };

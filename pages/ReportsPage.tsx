@@ -3,7 +3,11 @@ import { mockSprints, mockTasks } from '../data/mockData';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Sprint } from '../types';
 
-const ReportsPage: React.FC = () => {
+interface ReportsPageProps {
+  workspaceId?: string;
+}
+
+const ReportsPage: React.FC<ReportsPageProps> = ({ workspaceId }) => {
   const [selectedSprintId, setSelectedSprintId] = useState<string>(mockSprints[mockSprints.length - 1].id);
 
   const velocityData = useMemo(() => {

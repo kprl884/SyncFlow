@@ -26,6 +26,12 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMemberModal, setShowMemberModal] = useState(false);
+  const [showSprintGoalModal, setShowSprintGoalModal] = useState(false);
+  const [standupError, setStandupError] = useState<{
+    title: string;
+    message: string;
+    type: 'error' | 'warning' | 'info';
+  } | null>(null);
   const { currentUser } = useAuth();
 
   // Stand-up Mode State
@@ -42,6 +48,22 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
       },
     })
   );
+
+  const updateSprintGoal = async (newSprintGoal: string) => {
+    if (!currentUser || workspace?.members[currentUser.uid] !== 'Admin') return;
+
+    try {
+      const workspaceRef = doc(db, 'workspaces', workspaceId);
+      await updateDoc(workspaceRef, {
+        sprintGoal: newSprintGoal,
+        updatedAt: new Date().toISOString()
+      });
+      setShowSprintGoalModal(false);
+    } catch (error) {
+      console.error('Error updating sprint goal:', error);
+      alert('Sprint hedefi güncellenirken bir hata oluştu.');
+    }
+  };
 
   // Fetch workspace data
   useEffect(() => {
@@ -171,23 +193,38 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
 
   // --- Stand-up Mode Logic ---
   const startStandup = (team: Team) => {
-    const participantMap = new Map<string, User>();
-    tasks.forEach(task => {
-      if (task.team === team && task.assignee) {
-        participantMap.set(task.assignee.id, task.assignee);
+    try {
+      const participantMap = new Map<string, User>();
+      tasks.forEach(task => {
+        if (task.team === team && task.assignee) {
+          participantMap.set(task.assignee.id, task.assignee);
+        }
+      });
+      const participants = Array.from(participantMap.values());
+      
+      if (participants.length > 0) {
+          setStandupTeam(team);
+          setStandupParticipants(participants);
+          setCurrentSpeakerId(participants[0].id);
+          setIsStandupModeActive(true);
+          setIsTeamSelectOpen(false);
+      } else {
+          // Custom error dialog instead of alert
+          setStandupError({
+            title: 'Stand-up Başlatılamadı',
+            message: `${team} takımında atanmış kullanıcı bulunamadı. Stand-up başlatmak için önce görevlere kullanıcı atayın.`,
+            type: 'warning'
+          });
+          setIsTeamSelectOpen(false);
       }
-    });
-    const participants = Array.from(participantMap.values());
-    
-    if (participants.length > 0) {
-        setStandupTeam(team);
-        setStandupParticipants(participants);
-        setCurrentSpeakerId(participants[0].id);
-        setIsStandupModeActive(true);
-        setIsTeamSelectOpen(false);
-    } else {
-        alert(`No assigned users found for the ${team} team to start a stand-up.`);
-        setIsTeamSelectOpen(false);
+    } catch (error) {
+      console.error('Error starting standup:', error);
+      setStandupError({
+        title: 'Hata Oluştu',
+        message: 'Stand-up başlatılırken beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.',
+        type: 'error'
+      });
+      setIsTeamSelectOpen(false);
     }
   };
 
@@ -235,13 +272,23 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
             </h1>
             {/* Sprint Goal Banner */}
             {!isStandupModeActive && (
-              <div className="mt-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Sprint Goal:</span>
-                  <span className="text-sm text-blue-700 dark:text-blue-300">
-                    {workspace?.sprintGoal || "Sprint hedefi henüz belirlenmedi. Workspace ayarlarından belirleyebilirsiniz."}
-                  </span>
+              <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Sprint Goal:</span>
+                    <span className="text-sm text-blue-700 dark:text-blue-300">
+                      {workspace?.sprintGoal || "Sprint hedefi henüz belirlenmedi. Workspace ayarlarından belirleyebilirsiniz."}
+                    </span>
+                  </div>
+                  {currentUser && workspace?.members[currentUser.uid] === 'Admin' && (
+                    <button
+                      onClick={() => setShowSprintGoalModal(true)}
+                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium hover:underline"
+                    >
+                      Düzenle
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -315,6 +362,96 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
         />
       )}
 
+      {/* Sprint Goal Edit Modal */}
+      {showSprintGoalModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                Sprint Hedefini Düzenle
+              </h2>
+              <button
+                onClick={() => setShowSprintGoalModal(false)}
+                className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const newGoal = formData.get('sprintGoal') as string;
+                if (newGoal.trim()) {
+                  updateSprintGoal(newGoal.trim());
+                }
+              }}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Sprint Hedefi
+                  </label>
+                  <textarea
+                    name="sprintGoal"
+                    defaultValue={workspace?.sprintGoal || ''}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    placeholder="Bu sprint için hedefinizi yazın..."
+                    required
+                  />
+                </div>
+                
+                <div className="flex space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowSprintGoalModal(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+                  >
+                    İptal
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+                  >
+                    Güncelle
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Error Dialog */}
+      {standupError && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md">
+            <div className="p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className={`w-3 h-3 rounded-full ${
+                  standupError.type === 'error' ? 'bg-red-500' :
+                  standupError.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                }`}></div>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {standupError.title}
+                </h2>
+              </div>
+              
+              <p className="text-gray-700 dark:text-gray-300 mb-6">
+                {standupError.message}
+              </p>
+              
+              <button
+                onClick={() => setStandupError(null)}
+                className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+              >
+                Tamam
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isTeamSelectOpen && (
          <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex justify-center items-center p-4 animate-fade-in">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-sm p-6 animate-fade-in-up">
@@ -336,8 +473,9 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
                     ))}
                 </div>
             </div>
-         </div>
+        </div>
       )}
+      
        <style>{`
         @keyframes fade-in {
             from { opacity: 0; }

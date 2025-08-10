@@ -1,4 +1,4 @@
-import type { User, Sprint, Task } from '../types';
+import type { User, Sprint, Task, Note } from '../types';
 
 export const mockUsers: User[] = [
   { id: 'user-1', name: 'Alex Johnson', avatarUrl: 'https://picsum.photos/id/1005/200/200' },
@@ -172,4 +172,149 @@ export const mockTasks: Task[] = [
     team: 'General',
     tags: ['testing', 'e2e']
   },
+];
+
+export const mockNotes: Note[] = [
+  {
+    id: 'note-1',
+    title: 'Sprint Planning Notları - Q3-1',
+    content: `Bu sprint'te backend API geliştirmelerine odaklanacağız. 
+
+Öncelikli konular:
+- Authentication sistemi geliştirme
+- User management modülleri
+- Database schema optimizasyonu
+- API endpoint'lerin test edilmesi
+
+Takım üyeleri:
+- Alex: Backend API geliştirme
+- Maria: Frontend entegrasyon
+- James: DevOps ve CI/CD
+- Priya: UI/UX tasarım
+
+Sprint hedefi: Temel authentication flow'un tamamlanması ve test edilmesi.`,
+    workspaceId: 'workspace-1',
+    authorId: 'user-1',
+    authorName: 'Alex Johnson',
+    tags: ['sprint', 'backend', 'planning', 'authentication'],
+    category: 'Meeting',
+    isPublic: true,
+    createdAt: '2024-07-01T09:00:00Z',
+    updatedAt: '2024-07-01T09:00:00Z',
+    relatedSprints: ['sprint-1'],
+    relatedTasks: ['task-1', 'task-2', 'task-6']
+  },
+  {
+    id: 'note-2',
+    title: 'Technical Debt Analizi',
+    content: `Code review sürecinde tespit edilen technical debt noktaları ve çözüm önerileri:
+
+1. Frontend State Management:
+   - Local state kullanımı artıyor
+   - Context API'ye geçiş planlanmalı
+   - Redux/Zustand değerlendirilmeli
+
+2. Backend API Design:
+   - Error handling standardizasyonu gerekli
+   - Response format'ları tutarlı değil
+   - Validation middleware eklenmeli
+
+3. Testing Coverage:
+   - Unit test coverage %30'un altında
+   - Integration test'ler eksik
+   - E2E test'ler sadece critical path'lerde
+
+Öncelik sırası:
+1. Error handling standardizasyonu
+2. Unit test coverage artırımı
+3. State management refactoring`,
+    workspaceId: 'workspace-1',
+    authorId: 'user-2',
+    authorName: 'Maria Garcia',
+    tags: ['technical-debt', 'code-review', 'refactoring', 'testing'],
+    category: 'Technical',
+    isPublic: true,
+    createdAt: '2024-07-02T14:30:00Z',
+    updatedAt: '2024-07-02T14:30:00Z',
+    relatedTasks: ['task-9']
+  },
+  {
+    id: 'note-3',
+    title: 'UI/UX Design Principles',
+    content: `Proje için belirlenen UI/UX tasarım prensipleri:
+
+Renk Paleti:
+- Primary: #4F46E5 (Indigo)
+- Secondary: #10B981 (Emerald)
+- Accent: #F59E0B (Amber)
+- Neutral: #6B7280 (Gray)
+
+Typography:
+- Headings: Inter, sans-serif
+- Body: Inter, sans-serif
+- Monospace: JetBrains Mono (code blocks)
+
+Spacing System:
+- Base unit: 4px
+- Scale: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64
+
+Component Guidelines:
+- Consistent border radius (8px)
+- Subtle shadows (0 1px 3px rgba(0,0,0,0.1))
+- Smooth transitions (200ms ease-in-out)
+
+Accessibility:
+- WCAG 2.1 AA compliance
+- Keyboard navigation support
+- Screen reader compatibility
+- High contrast mode support`,
+    workspaceId: 'workspace-1',
+    authorId: 'user-4',
+    authorName: 'Priya Patel',
+    tags: ['design', 'ui', 'ux', 'accessibility', 'guidelines'],
+    category: 'Process',
+    isPublic: true,
+    createdAt: '2024-07-03T11:15:00Z',
+    updatedAt: '2024-07-03T11:15:00Z'
+  },
+  {
+    id: 'note-4',
+    title: 'API Endpoint Ideas',
+    content: `Gelecek sprint'ler için önerilen API endpoint'ler:
+
+User Management:
+- GET /api/users - Kullanıcı listesi
+- GET /api/users/:id - Kullanıcı detayı
+- PUT /api/users/:id - Kullanıcı güncelleme
+- DELETE /api/users/:id - Kullanıcı silme
+
+Task Management:
+- GET /api/tasks - Görev listesi (filtreleme ve sıralama ile)
+- POST /api/tasks - Yeni görev oluşturma
+- PUT /api/tasks/:id - Görev güncelleme
+- DELETE /api/tasks/:id - Görev silme
+- PUT /api/tasks/:id/status - Görev durumu güncelleme
+
+Sprint Management:
+- GET /api/sprints - Sprint listesi
+- POST /api/sprints - Yeni sprint oluşturma
+- PUT /api/sprints/:id - Sprint güncelleme
+- GET /api/sprints/:id/tasks - Sprint'e ait görevler
+
+Analytics:
+- GET /api/analytics/velocity - Takım hızı
+- GET /api/analytics/burndown - Burndown chart verisi
+- GET /api/analytics/team-performance - Takım performansı
+
+Not: Rate limiting ve authentication middleware'leri tüm endpoint'lere uygulanmalı.`,
+    workspaceId: 'workspace-1',
+    authorId: 'user-1',
+    authorName: 'Alex Johnson',
+    tags: ['api', 'endpoints', 'planning', 'architecture'],
+    category: 'Ideas',
+    isPublic: false,
+    createdAt: '2024-07-04T16:45:00Z',
+    updatedAt: '2024-07-04T16:45:00Z',
+    relatedTasks: ['task-8']
+  }
 ];

@@ -60,3 +60,30 @@ export interface DailyLog {
   }[];
   createdAt: string;
 }
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  workspaceId: string;
+  authorId: string;
+  authorName: string;
+  tags: string[];
+  category: 'General' | 'Meeting' | 'Technical' | 'Process' | 'Ideas';
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+  attachments?: string[]; // Array of file URLs
+  relatedTasks?: string[]; // Array of Task IDs
+  relatedSprints?: string[]; // Array of Sprint IDs
+}
+
+export interface NoteComment {
+  id: string;
+  noteId: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}

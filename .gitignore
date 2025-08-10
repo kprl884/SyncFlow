@@ -12,6 +12,28 @@ dist
 dist-ssr
 *.local
 
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Firebase configuration
+firebase.json
+firestore.indexes.json
+firestore.rules
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+
+# API Keys and sensitive data
+src/lib/firebase.ts
+src/lib/gemini.ts
+*.key
+*.pem
+*.p12
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getAuth, GoogleAuthProvider, OAuthProvider, connectAuthEmulator } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator, enableNetwork, disableNetwork } from "firebase/firestore";
 
 // Firebase project configuration for syncflow-app
 const firebaseConfig = {
@@ -19,8 +19,30 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Enable offline persistence and network handling
+enableNetwork(db).catch(console.error);
+
+// Network status monitoring
+let isOnline = navigator.onLine;
+
+window.addEventListener('online', () => {
+  isOnline = true;
+  console.log('Network: Online');
+  enableNetwork(db).catch(console.error);
+});
+
+window.addEventListener('offline', () => {
+  isOnline = false;
+  console.log('Network: Offline');
+  disableNetwork(db).catch(console.error);
+});
+
 // Providers
 const googleProvider = new GoogleAuthProvider();
 const microsoftProvider = new OAuthProvider('microsoft.com');
 
-export { app, auth, db, googleProvider, microsoftProvider };
+// Add scopes for better user experience
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
+
+export { app, auth, db, googleProvider, microsoftProvider, isOnline };
