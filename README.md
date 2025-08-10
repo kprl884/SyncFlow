@@ -1,43 +1,43 @@
-# 🚀 SyncFlow - Proje Yönetim Aracı
+# 🚀 SyncFlow - Project Management Tool
 
-SyncFlow, modern ekipler için tasarlanmış kapsamlı bir proje yönetim aracıdır. Kanban board, sprint yönetimi, raporlama ve notlar sistemi ile projelerinizi etkili bir şekilde yönetin.
+SyncFlow is a comprehensive project management tool designed for modern teams. Manage your projects effectively with Kanban board, sprint management, reporting, and notes system.
 
-## ✨ Özellikler
+## ✨ Features
 
 ### 🎯 **Kanban Board**
-- Sürükle-bırak ile görev yönetimi
-- Özelleştirilebilir sütunlar (To Do, In Progress, Done)
-- Görev detayları ve açıklamaları
-- Blocker yönetimi
-- Üye atama ve yönetimi
-- Standup kontrolleri
+- Drag-and-drop task management
+- Customizable columns (To Do, In Progress, Done)
+- Task details and descriptions
+- Blocker management
+- Member assignment and management
+- Standup check-ins
 
-### 📊 **Sprint Yönetimi**
-- Sprint planlama ve takibi
-- Velocity analizi
-- Sprint retrospektifleri
-- Görev-sprint ilişkilendirmesi
+### 📊 **Sprint Management**
+- Sprint planning and tracking
+- Velocity analysis
+- Sprint retrospectives
+- Task-sprint linking
 
-### 📈 **Raporlama Sistemi**
-- Sprint performans metrikleri
-- Takım verimliliği analizi
-- Burndown chart'ları
-- Trend analizleri
+### 📈 **Reporting System**
+- Sprint performance metrics
+- Team productivity analysis
+- Burndown charts
+- Trend analysis
 
-### 📝 **Notlar Sistemi**
-- Kategorilere göre not organizasyonu
-- Etiketleme sistemi
-- Görev ve sprint bağlantıları
-- Arama ve filtreleme
-- Görünürlük kontrolü (genel/özel)
+### 📝 **Notes System**
+- Note organization by categories
+- Tagging system
+- Task and sprint linking
+- Search and filtering
+- Visibility control (public/private)
 
-### 🤖 **AI Asistan**
-- Gemini AI entegrasyonu
-- Proje önerileri
-- Otomatik görev özetleri
-- Akıllı sprint planlama
+### 🤖 **AI Assistant**
+- Gemini AI integration
+- Project suggestions
+- Automatic task summaries
+- Smart sprint planning
 
-## 🛠️ Teknoloji Stack
+## 🛠️ Technology Stack
 
 - **Frontend**: React 18 + TypeScript
 - **Styling**: Tailwind CSS
@@ -47,29 +47,29 @@ SyncFlow, modern ekipler için tasarlanmış kapsamlı bir proje yönetim aracı
 - **Build Tool**: Vite
 - **Package Manager**: npm
 
-## 📋 Gereksinimler
+## 📋 Requirements
 
-- Node.js 18+ 
+- Node.js 18+
 - npm 9+
-- Firebase hesabı
-- Google Gemini AI API anahtarı
+- Firebase account
+- Google Gemini AI API key
 
-## 🚀 Kurulum
+## 🚀 Installation
 
-### 1. Repository'yi klonlayın
+### 1. Clone the repository
 ```bash
 git clone https://github.com/yourusername/syncflow.git
 cd syncflow
 ```
 
-### 2. Bağımlılıkları yükleyin
+### 2. Install dependencies
 ```bash
 npm install
 ```
 
-### 3. Environment değişkenlerini ayarlayın
+### 3. Set up environment variables
 
-`.env.local` dosyası oluşturun:
+Create a `.env.local` file:
 ```bash
 # Firebase Configuration
 VITE_FIREBASE_API_KEY=your_firebase_api_key
@@ -83,155 +83,155 @@ VITE_FIREBASE_APP_ID=your_app_id
 VITE_GEMINI_API_KEY=your_gemini_api_key
 ```
 
-### 4. Firebase projesini kurun
+### 4. Set up Firebase project
 
-1. [Firebase Console](https://console.firebase.google.com/)'a gidin
-2. Yeni proje oluşturun
-3. Authentication'ı etkinleştirin (Email/Password)
-4. Firestore Database'i oluşturun
-5. Proje ayarlarından config bilgilerini kopyalayın
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project
+3. Enable Authentication (Email/Password)
+4. Create Firestore Database
+5. Copy config information from project settings
 
-### 5. Gemini AI API anahtarı alın
+### 5. Get Gemini AI API key
 
-1. [Google AI Studio](https://makersuite.google.com/app/apikey)'ya gidin
-2. API anahtarı oluşturun
-3. `.env.local` dosyasına ekleyin
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create an API key
+3. Add it to your `.env.local` file
 
-### 6. Uygulamayı başlatın
+### 6. Start the application
 ```bash
 npm run dev
 ```
 
-Uygulama `http://localhost:5173` adresinde çalışacaktır.
+The application will run at `http://localhost:5173`.
 
-## 🔑 API Anahtarları ve Güvenlik
+## 🔑 API Keys and Security
 
-### ⚠️ **ÖNEMLİ**: Kendi API Anahtarlarınızı Alın
+### ⚠️ **IMPORTANT**: Get Your Own API Keys
 
-Bu proje Firebase ve Gemini AI servislerini kullanır. Bu servisler **ücretli** olabilir ve kendi API anahtarlarınızı kullanmanız gerekir.
+This project uses Firebase and Gemini AI services. These services may be **paid** and you need to use your own API keys.
 
-**Neden kendi anahtarlarınızı kullanmalısınız:**
-- Güvenlik: API anahtarları kişisel bilgilerdir
-- Maliyet kontrolü: Kendi kullanımınızı takip edebilirsiniz
-- Limitler: Kişisel kotalarınızı aşmazsınız
+**Why you should use your own keys:**
+- Security: API keys are personal information
+- Cost control: You can track your own usage
+- Limits: You won't exceed personal quotas
 
-**Gizli tutulması gereken dosyalar:**
+**Files that should be kept secret:**
 - `.env.local`
 - `src/lib/firebase.ts`
 - `src/lib/gemini.ts`
-- Firebase config dosyaları
+- Firebase config files
 
-## 💰 Maliyet Bilgileri
+## 💰 Cost Information
 
 ### Firebase
-- **Firestore**: İlk 1GB ücretsiz, sonrası $0.18/GB
-- **Authentication**: Ücretsiz (10,000 kullanıcıya kadar)
-- **Hosting**: Ücretsiz (1GB depolama, 10GB transfer)
+- **Firestore**: First 1GB free, then $0.18/GB
+- **Authentication**: Free (up to 10,000 users)
+- **Hosting**: Free (1GB storage, 10GB transfer)
 
 ### Gemini AI
-- **Gemini Pro**: $0.0025/1K karakter (input), $0.01/1K karakter (output)
-- **Gemini Flash**: $0.00075/1K karakter (input), $0.003/1K karakter (output)
+- **Gemini Pro**: $0.0025/1K characters (input), $0.01/1K characters (output)
+- **Gemini Flash**: $0.00075/1K characters (input), $0.003/1K characters (output)
 
-**Tahmini aylık maliyet (küçük ekip):**
+**Estimated monthly cost (small team):**
 - Firebase: $0-5
 - Gemini AI: $1-10
-- **Toplam**: $1-15/ay
+- **Total**: $1-15/month
 
-## 📁 Proje Yapısı
+## 📁 Project Structure
 
 ```
 syncflow/
-├── components/          # UI bileşenleri
-│   ├── kanban/         # Kanban board bileşenleri
-│   └── ui/             # Genel UI bileşenleri
-├── data/               # Mock veri ve test verileri
-├── pages/              # Sayfa bileşenleri
+├── components/          # UI components
+│   ├── kanban/         # Kanban board components
+│   └── ui/             # General UI components
+├── data/               # Mock data and test data
+├── pages/              # Page components
 ├── src/
-│   ├── context/        # React context'leri
-│   └── lib/            # Harici servis entegrasyonları
-├── types/               # TypeScript tip tanımları
-└── App.tsx             # Ana uygulama bileşeni
+│   ├── context/        # React contexts
+│   └── lib/            # External service integrations
+├── types/               # TypeScript type definitions
+└── App.tsx             # Main application component
 ```
 
-## 🔧 Geliştirme
+## 🔧 Development
 
 ### Scripts
 ```bash
-npm run dev          # Geliştirme sunucusunu başlat
-npm run build        # Production build oluştur
-npm run preview      # Production build'i önizle
-npm run lint         # ESLint ile kod kontrolü
+npm run dev          # Start development server
+npm run build        # Create production build
+npm run preview      # Preview production build
+npm run lint         # Code check with ESLint
 ```
 
-### Kod Standartları
+### Code Standards
 - TypeScript strict mode
 - ESLint + Prettier
 - Functional components
-- Hooks kullanımı
+- Hooks usage
 - Responsive design
 
-## 🚧 Yapılan İşler
+## 🚧 Completed Work
 
-### ✅ Tamamlanan Özellikler
-- [x] Proje yapısı ve routing
-- [x] Firebase entegrasyonu
-- [x] Kullanıcı kimlik doğrulama
-- [x] Workspace yönetimi
-- [x] Kanban board sistemi
-- [x] Sprint yönetimi
-- [x] Görev yönetimi
-- [x] Üye yönetimi
-- [x] Blocker sistemi
-- [x] Standup kontrolleri
-- [x] Raporlama sistemi
-- [x] Notlar sistemi
-- [x] AI asistan entegrasyonu
-- [x] Responsive tasarım
-- [x] Dark mode desteği
+### ✅ Completed Features
+- [x] Project structure and routing
+- [x] Firebase integration
+- [x] User authentication
+- [x] Workspace management
+- [x] Kanban board system
+- [x] Sprint management
+- [x] Task management
+- [x] Member management
+- [x] Blocker system
+- [x] Standup check-ins
+- [x] Reporting system
+- [x] Notes system
+- [x] AI assistant integration
+- [x] Responsive design
+- [x] Dark mode support
 
-### 🔄 Devam Eden Geliştirmeler
-- [ ] Gerçek zamanlı işbirliği
-- [ ] Dosya yükleme sistemi
-- [ ] Bildirim sistemi
-- [ ] Email entegrasyonu
-- [ ] Mobil uygulama
+### 🔄 Ongoing Development
+- [ ] Real-time collaboration
+- [ ] File upload system
+- [ ] Notification system
+- [ ] Email integration
+- [ ] Mobile application
 
-### 📋 Gelecek Özellikler
-- [ ] Gantt chart'ları
-- [ ] Zaman takibi
-- [ ] Bütçe yönetimi
-- [ ] Risk yönetimi
-- [ ] Dokümantasyon sistemi
-- [ ] API entegrasyonları
-- [ ] Webhook desteği
-- [ ] Export/Import özellikleri
+### 📋 Future Features
+- [ ] Gantt charts
+- [ ] Time tracking
+- [ ] Budget management
+- [ ] Risk management
+- [ ] Documentation system
+- [ ] API integrations
+- [ ] Webhook support
+- [ ] Export/Import features
 
-## 🤝 Katkıda Bulunma
+## 🤝 Contributing
 
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📄 Lisans
+## 📄 License
 
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosyasına bakın.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-## 🆘 Destek
+## 🆘 Support
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/syncflow/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/yourusername/syncflow/discussions)
 - **Email**: support@syncflow.com
 
-## 🙏 Teşekkürler
+## 🙏 Acknowledgments
 
-- [React](https://reactjs.org/) ekibine
-- [Firebase](https://firebase.google.com/) ekibine
-- [Google AI](https://ai.google.dev/) ekibine
-- [Tailwind CSS](https://tailwindcss.com/) ekibine
-- [Lucide](https://lucide.dev/) ekibine
+- [React](https://reactjs.org/) team
+- [Firebase](https://firebase.google.com/) team
+- [Google AI](https://ai.google.dev/) team
+- [Tailwind CSS](https://tailwindcss.com/) team
+- [Lucide](https://lucide.dev/) team
 
 ---
 
-**⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!**
+**⭐ Don't forget to star this project if you like it!**
