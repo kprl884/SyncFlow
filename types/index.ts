@@ -31,12 +31,22 @@ export interface Task {
   dependencies: string[]; // Array of Task IDs this task is blocked by
   team: Team;
   tags?: string[];
+  priority?: 'Low' | 'Medium' | 'High';
   completedAt?: string; // ISO Date String
   workspaceId: string; // Added workspace reference
   isBlocked?: boolean; // New field for blocker system
   blockerCategory?: 'Technical Dependency' | 'Needs Product Clarification' | 'Missing Asset/API' | 'External Issue';
   blockerDescription?: string;
   blockerAssignee?: string; // userId of assigned person
+  // SP Advisor için yeni alanlar
+  technicalComplexity?: {
+    apiImpact: number;
+    uiImpact: number;
+    databaseImpact: boolean;
+  };
+  uncertainty?: 'low' | 'medium' | 'high';
+  domains?: string[]; // ['frontend', 'backend', 'database', 'cicd', 'design', 'qa', 'devops', 'mobile', 'infrastructure', 'monitoring', 'testing', 'deployment', 'performance', 'security', 'notifications', 'state', 'api', 'ui', 'documentation', 'automation']
+  createdAt?: string; // ISO Date String
 }
 
 export interface Sprint {

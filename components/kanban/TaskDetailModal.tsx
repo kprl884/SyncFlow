@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import type { Task } from '../../types';
 import Modal from '../ui/Modal';
 import Avatar from '../ui/Avatar';
 import { TEAM_COLORS } from '../../constants';
-import { Link, GitCommitHorizontal, CheckCircle2 } from 'lucide-react';
+import { Link, GitCommitHorizontal, CheckCircle2, Calculator } from 'lucide-react';
+import SPEstimationWizard from '../ui/SPEstimationWizard';
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -13,6 +14,8 @@ interface TaskDetailModalProps {
 }
 
 const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, allTasks, onClose }) => {
+  const [isSPWizardOpen, setIsSPWizardOpen] = useState(false);
+  
   if (!task) return null;
 
   const dependencies = task.dependencies.map(depId => 
@@ -51,6 +54,13 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, allTasks, onClo
             <div className="flex items-center space-x-2">
               <GitCommitHorizontal className="h-5 w-5 text-indigo-500" />
               <span className="text-lg font-bold text-gray-800 dark:text-gray-100">{task.storyPoints || 'N/A'}</span>
+              <button
+                onClick={() => setIsSPWizardOpen(true)}
+                className="ml-2 p-1 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-md transition-colors duration-200"
+                title="Story Point Tahmin Sihirbazını Aç"
+              >
+                <Calculator className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -75,6 +85,18 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, allTasks, onClo
           </div>
         )}
 
+        {/* SP Estimation Wizard */}
+        <SPEstimationWizard
+          isOpen={isSPWizardOpen}
+          onClose={() => setIsSPWizardOpen(false)}
+          task={task}
+          onComplete={(storyPoints: number) => {
+            // Task'ı güncelle (gerçek uygulamada bu state management ile yapılır)
+            console.log(`Task ${task.id} için ${storyPoints} SP atandı`);
+            setIsSPWizardOpen(false);
+          }}
+          allTasks={allTasks}
+        />
       </div>
     </Modal>
   );

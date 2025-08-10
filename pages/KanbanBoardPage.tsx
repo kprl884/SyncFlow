@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { collection, query, where, getDocs, getDoc, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, onSnapshot, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { db } from '../src/lib/firebase';
 import { TASK_STATUSES } from '../constants';
 import KanbanColumn from '../components/kanban/KanbanColumn';
@@ -11,7 +11,8 @@ import TaskCard from '../components/ui/TaskCard';
 import TaskDetailModal from '../components/kanban/TaskDetailModal';
 import StandupControls from '../components/kanban/StandupControls';
 import MemberManagementModal from '../components/kanban/MemberManagementModal';
-import { PlayCircle, X, Users, Settings } from 'lucide-react';
+import TaskCreationModal from '../components/ui/TaskCreationModal';
+import { PlayCircle, X, Users, Settings, Plus } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
 
 interface KanbanBoardPageProps {
@@ -27,6 +28,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   const [loading, setLoading] = useState(true);
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [showSprintGoalModal, setShowSprintGoalModal] = useState(false);
+  const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
   const [standupError, setStandupError] = useState<{
     title: string;
     message: string;
@@ -62,6 +64,23 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
     } catch (error) {
       console.error('Error updating sprint goal:', error);
       alert('Sprint hedefi güncellenirken bir hata oluştu.');
+    }
+  };
+
+  const handleCreateTask = async (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      const taskRef = collection(db, 'workspaces', workspaceId, 'tasks');
+      const newTask = {
+        ...taskData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      await addDoc(taskRef, newTask);
+      console.log('Task başarıyla oluşturuldu');
+    } catch (error) {
+      console.error('Error creating task:', error);
+      alert('Task oluşturulurken bir hata oluştu.');
     }
   };
 
@@ -297,6 +316,13 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
             {!isStandupModeActive && (
               <>
                 <button
+                  onClick={() => setShowCreateTaskModal(true)}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Yeni Task</span>
+                </button>
+                <button
                   onClick={() => setShowMemberModal(true)}
                   className="flex items-center space-x-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                 >
@@ -314,22 +340,31 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
             )}
           </div>
         </div>
-        <main className="flex-grow p-4 overflow-x-auto">
-          <div className="flex space-x-4 h-full">
-            <SortableContext items={TASK_STATUSES}>
-              {TASK_STATUSES.map((status) => (
-                <KanbanColumn
-                  key={status}
-                  title={status}
-                  tasks={tasksByStatus[status] || []}
-                  onTaskClick={handleTaskClick}
-                  isStandupActive={isStandupModeActive}
-                  currentSpeakerId={currentSpeakerId}
-                />
-              ))}
-            </SortableContext>
+        {loading ? (
+          <div className="flex-grow flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin h-12 w-12 border-4 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Yükleniyor...</p>
+            </div>
           </div>
-        </main>
+        ) : (
+          <main className="flex-grow p-4 overflow-x-auto">
+            <div className="flex space-x-4 h-full">
+              <SortableContext items={TASK_STATUSES}>
+                {TASK_STATUSES.map((status) => (
+                  <KanbanColumn
+                    key={status}
+                    title={status}
+                    tasks={tasksByStatus[status] || []}
+                    onTaskClick={handleTaskClick}
+                    isStandupActive={isStandupModeActive}
+                    currentSpeakerId={currentSpeakerId}
+                  />
+                ))}
+              </SortableContext>
+            </div>
+          </main>
+        )}
       </div>
 
       {createPortal(
@@ -343,6 +378,15 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
         task={selectedTask}
         allTasks={tasks} 
         onClose={handleCloseModal} 
+      />
+
+      <TaskCreationModal
+        isOpen={showCreateTaskModal}
+        onClose={() => setShowCreateTaskModal(false)}
+        onCreateTask={handleCreateTask}
+        users={users}
+        workspaceId={workspaceId}
+        existingTasks={tasks}
       />
 
       {showMemberModal && (

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Task } from '../../types';
-import { TEAM_COLORS } from '../../constants';
+import { TEAM_COLORS, PRIORITY_COLORS } from '../../constants';
 import Avatar from './Avatar';
 import { Link } from 'lucide-react';
 
@@ -31,11 +31,23 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, isOverlay = false, i
            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${teamColor}`}>
             {task.team}
            </span>
+            {task.priority && (
+              <span className={`px-2 py-1 text-xs font-medium rounded-full ${PRIORITY_COLORS[task.priority]}`}>
+                {task.priority}
+              </span>
+            )}
             {task.tags?.map(tag => (
                 <span key={tag} className="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-600 rounded-full">{tag}</span>
             ))}
         </div>
-        {task.assignee && <Avatar user={task.assignee} />}
+        <div className="flex items-center space-x-2">
+          {task.storyPoints && (
+            <span className="px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300 rounded-full">
+              {task.storyPoints} SP
+            </span>
+          )}
+          {task.assignee && <Avatar user={task.assignee} />}
+        </div>
       </div>
     </div>
   );

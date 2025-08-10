@@ -46,6 +46,15 @@ export const mockUsers: User[] = [
     role: 'Manager',
     createdAt: '2024-01-05T00:00:00Z',
     updatedAt: '2024-01-05T00:00:00Z'
+  },
+  {
+    id: 'user-6',
+    name: 'Lisa Wang',
+    email: 'lisa@syncflow.com',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
+    role: 'Member',
+    createdAt: '2024-01-10T00:00:00Z',
+    updatedAt: '2024-01-10T00:00:00Z'
   }
 ];
 
@@ -73,6 +82,18 @@ export const mockWorkspaces: Workspace[] = [
     updatedAt: '2024-01-15T00:00:00Z',
     jiraProjectKey: 'MOBILE',
     bitbucketRepoSlug: 'mobile-app',
+    isPublic: false
+  },
+  {
+    id: 'workspace-3',
+    name: 'DevOps & Infrastructure',
+    description: 'DevOps, CI/CD, and infrastructure management workspace',
+    members: [mockUsers[0], mockUsers[4], mockUsers[3], mockUsers[5]],
+    ownerId: 'user-1',
+    createdAt: '2024-01-20T00:00:00Z',
+    updatedAt: '2024-01-20T00:00:00Z',
+    jiraProjectKey: 'DEVOPS',
+    bitbucketRepoSlug: 'devops-infra',
     isPublic: false
   }
 ];
@@ -110,9 +131,53 @@ export const mockSprints: Sprint[] = [
     startDate: '2024-02-01',
     endDate: '2024-02-15',
     status: 'Planning',
-    tasks: [],
+    tasks: ['task-7', 'task-8', 'task-9', 'task-10', 'task-11', 'task-12'],
     createdAt: '2024-02-01T00:00:00Z',
     updatedAt: '2024-02-01T00:00:00Z'
+  },
+  {
+    id: 'sprint-4',
+    name: 'Q1-4: Testing & Polish',
+    workspaceId: 'workspace-1',
+    startDate: '2024-02-16',
+    endDate: '2024-02-29',
+    status: 'Planning',
+    tasks: ['task-13', 'task-14', 'task-15', 'task-16'],
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z'
+  },
+  {
+    id: 'sprint-5',
+    name: 'Mobile App - Phase 1',
+    workspaceId: 'workspace-2',
+    startDate: '2024-01-20',
+    endDate: '2024-02-03',
+    status: 'Active',
+    tasks: ['task-17', 'task-18', 'task-19', 'task-20', 'task-21', 'task-22'],
+    createdAt: '2024-01-20T00:00:00Z',
+    updatedAt: '2024-01-20T00:00:00Z'
+  },
+  {
+    id: 'sprint-6',
+    name: 'Mobile App - Phase 2',
+    workspaceId: 'workspace-2',
+    startDate: '2024-02-04',
+    endDate: '2024-02-17',
+    status: 'Planning',
+    tasks: ['task-23', 'task-24', 'task-25'],
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z'
+  },
+  {
+    id: 'sprint-7',
+    name: 'DevOps - Infrastructure Setup',
+    workspaceId: 'workspace-3',
+    startDate: '2024-01-25',
+    endDate: '2024-02-07',
+    status: 'Active',
+    tasks: ['task-26', 'task-27', 'task-28'],
+    createdAt: '2024-01-25T00:00:00Z',
+    updatedAt: '2024-01-25T00:00:00Z'
   }
 ];
 
@@ -133,7 +198,15 @@ export const mockTasks: Task[] = [
     priority: 'High',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-05T00:00:00Z',
-    jiraKey: 'SYNC-1'
+    jiraKey: 'SYNC-1',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 2,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['frontend', 'backend'],
+    completedAt: '2024-01-05T00:00:00Z'
   },
   {
     id: 'task-2',
@@ -150,7 +223,15 @@ export const mockTasks: Task[] = [
     priority: 'High',
     createdAt: '2024-01-02T00:00:00Z',
     updatedAt: '2024-01-10T00:00:00Z',
-    jiraKey: 'SYNC-2'
+    jiraKey: 'SYNC-2',
+    technicalComplexity: {
+      apiImpact: 3,
+      uiImpact: 1,
+      databaseImpact: true
+    },
+    uncertainty: 'medium',
+    domains: ['backend', 'database', 'frontend'],
+    completedAt: '2024-01-10T00:00:00Z'
   },
   {
     id: 'task-3',
@@ -167,7 +248,15 @@ export const mockTasks: Task[] = [
     priority: 'Medium',
     createdAt: '2024-01-03T00:00:00Z',
     updatedAt: '2024-01-12T00:00:00Z',
-    jiraKey: 'SYNC-3'
+    jiraKey: 'SYNC-3',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 8,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['frontend', 'design'],
+    completedAt: '2024-01-12T00:00:00Z'
   },
   {
     id: 'task-4',
@@ -184,7 +273,14 @@ export const mockTasks: Task[] = [
     priority: 'High',
     createdAt: '2024-01-16T00:00:00Z',
     updatedAt: '2024-01-20T00:00:00Z',
-    jiraKey: 'SYNC-4'
+    jiraKey: 'SYNC-4',
+    technicalComplexity: {
+      apiImpact: 2,
+      uiImpact: 8,
+      databaseImpact: false
+    },
+    uncertainty: 'medium',
+    domains: ['frontend', 'ui']
   },
   {
     id: 'task-5',
@@ -201,7 +297,14 @@ export const mockTasks: Task[] = [
     priority: 'High',
     createdAt: '2024-01-17T00:00:00Z',
     updatedAt: '2024-01-21T00:00:00Z',
-    jiraKey: 'SYNC-5'
+    jiraKey: 'SYNC-5',
+    technicalComplexity: {
+      apiImpact: 5,
+      uiImpact: 3,
+      databaseImpact: true
+    },
+    uncertainty: 'low',
+    domains: ['backend', 'database', 'frontend']
   },
   {
     id: 'task-6',
@@ -218,7 +321,542 @@ export const mockTasks: Task[] = [
     priority: 'Medium',
     createdAt: '2024-01-18T00:00:00Z',
     updatedAt: '2024-01-18T00:00:00Z',
-    jiraKey: 'SYNC-6'
+    jiraKey: 'SYNC-6',
+    technicalComplexity: {
+      apiImpact: 3,
+      uiImpact: 2,
+      databaseImpact: true
+    },
+    uncertainty: 'medium',
+    domains: ['backend', 'database', 'frontend']
+  },
+  {
+    id: 'task-7',
+    title: 'Database schema design',
+    description: 'Design and implement the database schema for tasks, sprints, and users',
+    status: 'Todo',
+    assignee: mockUsers[4],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-3',
+    storyPoints: 13,
+    dependencies: [],
+    team: 'Backend',
+    tags: ['database', 'schema', 'design'],
+    priority: 'High',
+    createdAt: '2024-01-25T00:00:00Z',
+    updatedAt: '2024-01-25T00:00:00Z',
+    jiraKey: 'SYNC-7',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 0,
+      databaseImpact: true
+    },
+    uncertainty: 'low',
+    domains: ['database', 'backend']
+  },
+  {
+    id: 'task-8',
+    title: 'API endpoint development',
+    description: 'Create RESTful API endpoints for all CRUD operations',
+    status: 'Todo',
+    assignee: mockUsers[0],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-3',
+    storyPoints: 21,
+    dependencies: ['task-7'],
+    team: 'Backend',
+    tags: ['api', 'endpoints', 'rest'],
+    priority: 'High',
+    createdAt: '2024-01-26T00:00:00Z',
+    updatedAt: '2024-01-26T00:00:00Z',
+    jiraKey: 'SYNC-8',
+    technicalComplexity: {
+      apiImpact: 8,
+      uiImpact: 0,
+      databaseImpact: true
+    },
+    uncertainty: 'medium',
+    domains: ['backend', 'api', 'database']
+  },
+  {
+    id: 'task-9',
+    title: 'Frontend state management',
+    description: 'Implement state management solution with React Context or Redux',
+    status: 'Todo',
+    assignee: mockUsers[2],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-3',
+    storyPoints: 8,
+    dependencies: ['task-8'],
+    team: 'Frontend',
+    tags: ['state', 'management', 'react'],
+    priority: 'Medium',
+    createdAt: '2024-01-27T00:00:00Z',
+    updatedAt: '2024-01-27T00:00:00Z',
+    jiraKey: 'SYNC-9',
+    technicalComplexity: {
+      apiImpact: 1,
+      uiImpact: 4,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['frontend', 'state']
+  },
+  {
+    id: 'task-10',
+    title: 'User permission system',
+    description: 'Implement role-based access control and user permissions',
+    status: 'Todo',
+    assignee: mockUsers[1],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-3',
+    storyPoints: 13,
+    dependencies: ['task-8'],
+    team: 'Backend',
+    tags: ['permissions', 'security', 'rbac'],
+    priority: 'Medium',
+    createdAt: '2024-01-28T00:00:00Z',
+    updatedAt: '2024-01-28T00:00:00Z',
+    jiraKey: 'SYNC-10',
+    technicalComplexity: {
+      apiImpact: 4,
+      uiImpact: 2,
+      databaseImpact: true
+    },
+    uncertainty: 'medium',
+    domains: ['backend', 'security', 'database']
+  },
+  {
+    id: 'task-11',
+    title: 'Real-time notifications',
+    description: 'Implement WebSocket-based real-time notifications for task updates',
+    status: 'Todo',
+    assignee: mockUsers[3],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-3',
+    storyPoints: 21,
+    dependencies: ['task-8', 'task-9'],
+    team: 'Frontend',
+    tags: ['websockets', 'notifications', 'realtime'],
+    priority: 'Low',
+    createdAt: '2024-01-29T00:00:00Z',
+    updatedAt: '2024-01-29T00:00:00Z',
+    jiraKey: 'SYNC-11',
+    technicalComplexity: {
+      apiImpact: 3,
+      uiImpact: 5,
+      databaseImpact: false
+    },
+    uncertainty: 'high',
+    domains: ['frontend', 'backend', 'websockets']
+  },
+  {
+    id: 'task-12',
+    title: 'Performance optimization',
+    description: 'Optimize application performance with lazy loading and caching',
+    status: 'Todo',
+    assignee: mockUsers[4],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-3',
+    storyPoints: 8,
+    dependencies: ['task-9'],
+    team: 'Frontend',
+    tags: ['performance', 'optimization', 'caching'],
+    priority: 'Low',
+    createdAt: '2024-01-30T00:00:00Z',
+    updatedAt: '2024-01-30T00:00:00Z',
+    jiraKey: 'SYNC-12',
+    technicalComplexity: {
+      apiImpact: 1,
+      uiImpact: 3,
+      databaseImpact: false
+    },
+    uncertainty: 'medium',
+    domains: ['frontend', 'performance']
+  },
+  {
+    id: 'task-13',
+    title: 'Unit testing implementation',
+    description: 'Write comprehensive unit tests for all components and functions',
+    status: 'Todo',
+    assignee: mockUsers[2],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-4',
+    storyPoints: 13,
+    dependencies: ['task-8', 'task-9'],
+    team: 'Frontend',
+    tags: ['testing', 'unit', 'quality'],
+    priority: 'Medium',
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z',
+    jiraKey: 'SYNC-13',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 2,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['frontend', 'testing']
+  },
+  {
+    id: 'task-14',
+    title: 'Integration testing',
+    description: 'Implement end-to-end testing for critical user workflows',
+    status: 'Todo',
+    assignee: mockUsers[4],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-4',
+    storyPoints: 21,
+    dependencies: ['task-13'],
+    team: 'General',
+    tags: ['testing', 'integration', 'e2e'],
+    priority: 'Medium',
+    createdAt: '2024-02-02T00:00:00Z',
+    updatedAt: '2024-02-02T00:00:00Z',
+    jiraKey: 'SYNC-14',
+    technicalComplexity: {
+      apiImpact: 3,
+      uiImpact: 4,
+      databaseImpact: true
+    },
+    uncertainty: 'medium',
+    domains: ['testing', 'frontend', 'backend', 'database']
+  },
+  {
+    id: 'task-15',
+    title: 'Performance monitoring',
+    description: 'Implement performance monitoring and analytics tools',
+    status: 'Todo',
+    assignee: mockUsers[0],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-4',
+    storyPoints: 8,
+    dependencies: ['task-12'],
+    team: 'Backend',
+    tags: ['monitoring', 'performance', 'analytics'],
+    priority: 'Low',
+    createdAt: '2024-02-03T00:00:00Z',
+    updatedAt: '2024-02-03T00:00:00Z',
+    jiraKey: 'SYNC-15',
+    technicalComplexity: {
+      apiImpact: 2,
+      uiImpact: 1,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['backend', 'monitoring']
+  },
+  {
+    id: 'task-16',
+    title: 'Documentation and deployment',
+    description: 'Create comprehensive documentation and prepare for production deployment',
+    status: 'Todo',
+    assignee: mockUsers[1],
+    workspaceId: 'workspace-1',
+    sprintId: 'sprint-4',
+    storyPoints: 5,
+    dependencies: ['task-14', 'task-15'],
+    team: 'General',
+    tags: ['documentation', 'deployment', 'production'],
+    priority: 'Medium',
+    createdAt: '2024-02-04T00:00:00Z',
+    updatedAt: '2024-02-04T00:00:00Z',
+    jiraKey: 'SYNC-16',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 0,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['documentation', 'deployment']
+  },
+  {
+    id: 'task-17',
+    title: 'Mobile app architecture setup',
+    description: 'Set up React Native project structure with TypeScript and navigation',
+    status: 'In Progress',
+    assignee: mockUsers[4],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-5',
+    storyPoints: 13,
+    dependencies: [],
+    team: 'Mobile',
+    tags: ['mobile', 'setup', 'architecture'],
+    priority: 'High',
+    createdAt: '2024-01-20T00:00:00Z',
+    updatedAt: '2024-01-25T00:00:00Z',
+    jiraKey: 'MOBILE-1',
+    technicalComplexity: {
+      apiImpact: 1,
+      uiImpact: 3,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['mobile', 'frontend']
+  },
+  {
+    id: 'task-18',
+    title: 'Native navigation implementation',
+    description: 'Implement React Navigation with stack and tab navigators',
+    status: 'In Progress',
+    assignee: mockUsers[2],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-5',
+    storyPoints: 8,
+    dependencies: ['task-17'],
+    team: 'Mobile',
+    tags: ['mobile', 'navigation', 'ui'],
+    priority: 'Medium',
+    createdAt: '2024-01-21T00:00:00Z',
+    updatedAt: '2024-01-26T00:00:00Z',
+    jiraKey: 'MOBILE-2',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 5,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['mobile', 'ui']
+  },
+  {
+    id: 'task-19',
+    title: 'API integration for mobile',
+    description: 'Create mobile-specific API client and integrate with backend services',
+    status: 'Todo',
+    assignee: mockUsers[1],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-5',
+    storyPoints: 13,
+    dependencies: ['task-17'],
+    team: 'Mobile',
+    tags: ['mobile', 'api', 'integration'],
+    priority: 'High',
+    createdAt: '2024-01-22T00:00:00Z',
+    updatedAt: '2024-01-22T00:00:00Z',
+    jiraKey: 'MOBILE-3',
+    technicalComplexity: {
+      apiImpact: 6,
+      uiImpact: 1,
+      databaseImpact: false
+    },
+    uncertainty: 'medium',
+    domains: ['mobile', 'api', 'backend']
+  },
+  {
+    id: 'task-20',
+    title: 'Offline data synchronization',
+    description: 'Implement offline-first approach with data sync when connection is restored',
+    status: 'Todo',
+    assignee: mockUsers[4],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-5',
+    storyPoints: 21,
+    dependencies: ['task-19'],
+    team: 'Mobile',
+    tags: ['mobile', 'offline', 'sync'],
+    priority: 'Medium',
+    createdAt: '2024-01-23T00:00:00Z',
+    updatedAt: '2024-01-23T00:00:00Z',
+    jiraKey: 'MOBILE-4',
+    technicalComplexity: {
+      apiImpact: 4,
+      uiImpact: 2,
+      databaseImpact: true
+    },
+    uncertainty: 'high',
+    domains: ['mobile', 'database', 'api']
+  },
+  {
+    id: 'task-21',
+    title: 'Push notification system',
+    description: 'Implement push notifications for task updates and reminders',
+    status: 'Todo',
+    assignee: mockUsers[2],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-5',
+    storyPoints: 13,
+    dependencies: ['task-19'],
+    team: 'Mobile',
+    tags: ['mobile', 'notifications', 'push'],
+    priority: 'Low',
+    createdAt: '2024-01-24T00:00:00Z',
+    updatedAt: '2024-01-24T00:00:00Z',
+    jiraKey: 'MOBILE-5',
+    technicalComplexity: {
+      apiImpact: 3,
+      uiImpact: 1,
+      databaseImpact: false
+    },
+    uncertainty: 'medium',
+    domains: ['mobile', 'notifications']
+  },
+  {
+    id: 'task-22',
+    title: 'Mobile UI component library',
+    description: 'Create reusable mobile UI components with consistent design',
+    status: 'Todo',
+    assignee: mockUsers[1],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-5',
+    storyPoints: 8,
+    dependencies: ['task-18'],
+    team: 'Mobile',
+    tags: ['mobile', 'ui', 'components'],
+    priority: 'Medium',
+    createdAt: '2024-01-25T00:00:00Z',
+    updatedAt: '2024-01-25T00:00:00Z',
+    jiraKey: 'MOBILE-6',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 6,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['mobile', 'ui', 'design']
+  },
+  {
+    id: 'task-23',
+    title: 'Mobile app testing',
+    description: 'Implement comprehensive testing for mobile app including unit and integration tests',
+    status: 'Todo',
+    assignee: mockUsers[4],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-6',
+    storyPoints: 13,
+    dependencies: ['task-22'],
+    team: 'Mobile',
+    tags: ['mobile', 'testing', 'quality'],
+    priority: 'Medium',
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z',
+    jiraKey: 'MOBILE-7',
+    technicalComplexity: {
+      apiImpact: 1,
+      uiImpact: 3,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['mobile', 'testing']
+  },
+  {
+    id: 'task-24',
+    title: 'Performance optimization for mobile',
+    description: 'Optimize mobile app performance including memory usage and battery optimization',
+    status: 'Todo',
+    assignee: mockUsers[2],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-6',
+    storyPoints: 8,
+    dependencies: ['task-23'],
+    team: 'Mobile',
+    tags: ['mobile', 'performance', 'optimization'],
+    priority: 'Low',
+    createdAt: '2024-02-02T00:00:00Z',
+    updatedAt: '2024-02-02T00:00:00Z',
+    jiraKey: 'MOBILE-8',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 2,
+      databaseImpact: false
+    },
+    uncertainty: 'medium',
+    domains: ['mobile', 'performance']
+  },
+  {
+    id: 'task-25',
+    title: 'App store preparation',
+    description: 'Prepare mobile app for app store submission including metadata and screenshots',
+    status: 'Todo',
+    assignee: mockUsers[1],
+    workspaceId: 'workspace-2',
+    sprintId: 'sprint-6',
+    storyPoints: 5,
+    dependencies: ['task-24'],
+    team: 'Mobile',
+    tags: ['mobile', 'deployment', 'app-store'],
+    priority: 'Medium',
+    createdAt: '2024-02-03T00:00:00Z',
+    updatedAt: '2024-02-03T00:00:00Z',
+    jiraKey: 'MOBILE-9',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 1,
+      databaseImpact: false
+    },
+    uncertainty: 'low',
+    domains: ['mobile', 'deployment']
+  },
+  {
+    id: 'task-26',
+    title: 'CI/CD pipeline setup',
+    description: 'Set up automated CI/CD pipeline with GitHub Actions and deployment automation',
+    status: 'In Progress',
+    assignee: mockUsers[0],
+    workspaceId: 'workspace-3',
+    sprintId: 'sprint-7',
+    storyPoints: 13,
+    dependencies: [],
+    team: 'General',
+    tags: ['devops', 'ci-cd', 'automation'],
+    priority: 'High',
+    createdAt: '2024-01-25T00:00:00Z',
+    updatedAt: '2024-01-28T00:00:00Z',
+    jiraKey: 'DEVOPS-1',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 0,
+      databaseImpact: false
+    },
+    uncertainty: 'medium',
+    domains: ['devops', 'automation']
+  },
+  {
+    id: 'task-27',
+    title: 'Infrastructure as Code',
+    description: 'Implement infrastructure as code using Terraform for cloud resources',
+    status: 'In Progress',
+    assignee: mockUsers[4],
+    workspaceId: 'workspace-3',
+    sprintId: 'sprint-7',
+    storyPoints: 21,
+    dependencies: ['task-26'],
+    team: 'General',
+    tags: ['devops', 'terraform', 'infrastructure'],
+    priority: 'High',
+    createdAt: '2024-01-26T00:00:00Z',
+    updatedAt: '2024-01-29T00:00:00Z',
+    jiraKey: 'DEVOPS-2',
+    technicalComplexity: {
+      apiImpact: 0,
+      uiImpact: 0,
+      databaseImpact: false
+    },
+    uncertainty: 'high',
+    domains: ['devops', 'infrastructure']
+  },
+  {
+    id: 'task-28',
+    title: 'Monitoring and logging setup',
+    description: 'Set up comprehensive monitoring and logging with Prometheus and ELK stack',
+    status: 'Todo',
+    assignee: mockUsers[5],
+    workspaceId: 'workspace-3',
+    sprintId: 'sprint-7',
+    storyPoints: 13,
+    dependencies: ['task-27'],
+    team: 'General',
+    tags: ['devops', 'monitoring', 'logging'],
+    priority: 'Medium',
+    createdAt: '2024-01-27T00:00:00Z',
+    updatedAt: '2024-01-27T00:00:00Z',
+    jiraKey: 'DEVOPS-3',
+    technicalComplexity: {
+      apiImpact: 1,
+      uiImpact: 0,
+      databaseImpact: false
+    },
+    uncertainty: 'medium',
+    domains: ['devops', 'monitoring']
   }
 ];
 
@@ -290,6 +928,38 @@ Color palette: Primary blue (#3B82F6), Success green (#10B981), Warning yellow (
     createdAt: '2024-01-08T16:00:00Z',
     updatedAt: '2024-01-08T16:00:00Z',
     relatedTasks: ['task-3', 'task-4']
+  },
+  {
+    id: 'note-4',
+    title: 'DevOps Strategy and Tools',
+    content: `DevOps strategy for SyncFlow project:
+
+Infrastructure Tools:
+- Terraform for infrastructure as code
+- GitHub Actions for CI/CD
+- Docker for containerization
+- Kubernetes for orchestration (future)
+
+Monitoring Stack:
+- Prometheus for metrics collection
+- Grafana for visualization
+- ELK stack for logging
+- AlertManager for notifications
+
+Best Practices:
+- Infrastructure as code
+- Automated testing in pipeline
+- Blue-green deployments
+- Comprehensive monitoring`,
+    workspaceId: 'workspace-3',
+    authorId: 'user-1',
+    authorName: 'Alex Johnson',
+    tags: ['devops', 'strategy', 'tools', 'infrastructure'],
+    category: 'Technical',
+    isPublic: true,
+    createdAt: '2024-01-25T09:00:00Z',
+    updatedAt: '2024-01-25T09:00:00Z',
+    relatedTasks: ['task-26', 'task-27', 'task-28']
   }
 ];
 
@@ -314,5 +984,15 @@ export const mockInvitations: Invitation[] = [
     status: 'Accepted',
     expiresAt: '2024-01-25T00:00:00Z',
     createdAt: '2024-01-15T00:00:00Z'
+  },
+  {
+    id: 'inv-3',
+    workspaceId: 'workspace-3',
+    email: 'devops@syncflow.com',
+    role: 'Member',
+    invitedBy: 'user-1',
+    status: 'Pending',
+    expiresAt: '2024-02-10T00:00:00Z',
+    createdAt: '2024-01-28T00:00:00Z'
   }
 ];
