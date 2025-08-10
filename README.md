@@ -170,41 +170,6 @@ npm run lint         # Code check with ESLint
 - Hooks usage
 - Responsive design
 
-## 🚧 Completed Work
-
-### ✅ Completed Features
-- [x] Project structure and routing
-- [x] Firebase integration
-- [x] User authentication
-- [x] Workspace management
-- [x] Kanban board system
-- [x] Sprint management
-- [x] Task management
-- [x] Member management
-- [x] Blocker system
-- [x] Standup check-ins
-- [x] Reporting system
-- [x] Notes system
-- [x] AI assistant integration
-- [x] Responsive design
-- [x] Dark mode support
-
-### 🔄 Ongoing Development
-- [ ] Real-time collaboration
-- [ ] File upload system
-- [ ] Notification system
-- [ ] Email integration
-- [ ] Mobile application
-
-### 📋 Future Features
-- [ ] Gantt charts
-- [ ] Time tracking
-- [ ] Budget management
-- [ ] Risk management
-- [ ] Documentation system
-- [ ] API integrations
-- [ ] Webhook support
-- [ ] Export/Import features
 
 ## 🤝 Contributing
 
@@ -217,21 +182,5 @@ npm run lint         # Code check with ESLint
 ## 📄 License
 
 This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## 🆘 Support
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/syncflow/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/syncflow/discussions)
-- **Email**: support@syncflow.com
-
-## 🙏 Acknowledgments
-
-- [React](https://reactjs.org/) team
-- [Firebase](https://firebase.google.com/) team
-- [Google AI](https://ai.google.dev/) team
-- [Tailwind CSS](https://tailwindcss.com/) team
-- [Lucide](https://lucide.dev/) team
-
----
 
 **⭐ Don't forget to star this project if you like it!**
