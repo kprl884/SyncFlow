@@ -34,6 +34,18 @@ const LoadingSpinner: React.FC = () => (
     </div>
 );
 
+const DefaultRedirect: React.FC = () => {
+  const { currentUser } = useAuth();
+  const savedWorkspace = localStorage.getItem('test-user-workspace');
+  const isTestUser = currentUser?.uid === 'test-fatih-terim-001';
+
+  if (isTestUser && savedWorkspace) {
+    return <Navigate to={`/workspace/${savedWorkspace}`} replace />;
+  }
+
+  return <Navigate to="/workspaces" replace />;
+};
+
 const AppContent: React.FC = () => {
   const { currentUser, loading, signOutUser } = useAuth();
 
