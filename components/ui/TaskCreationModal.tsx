@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Minus, Users, Tag, Calendar, AlertCircle, CheckCircle, Clock, Zap, Sparkles } from 'lucide-react';
-import type { Task, User, Team } from '../../types';
-import { TASK_STATUSES, TEAM_COLORS, DEFAULT_TAGS } from '../../constants';
+import type { Task, User, Team, KanbanColumn } from '../../types';
+import { TEAM_COLORS, DEFAULT_TAGS } from '../../constants';
 import { aiService, type AITaskDescriptionResponse } from '../../src/lib/ai-service';
 
 interface TaskCreationModalProps {
@@ -11,6 +11,7 @@ interface TaskCreationModalProps {
   users: User[];
   workspaceId: string;
   existingTasks: Task[];
+  availableColumns: KanbanColumn[];
 }
 
 const STORY_POINT_OPTIONS = [1, 2, 3, 5, 8, 13, 21, 34];
@@ -22,12 +23,13 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
   onCreateTask,
   users,
   workspaceId,
-  existingTasks
+  existingTasks,
+  availableColumns
 }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    status: 'Todo' as const,
+    status: availableColumns[0]?.name || 'Todo',
     assigneeId: '',
     team: 'General' as Team,
     storyPoints: 3,
@@ -55,7 +57,7 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
       setFormData({
         title: '',
         description: '',
-        status: 'Todo',
+        status: availableColumns[0]?.name || 'Todo',
         assigneeId: '',
         team: 'General',
         storyPoints: 3,
@@ -293,11 +295,11 @@ const TaskCreationModal: React.FC<TaskCreationModalProps> = ({
               </label>
               <select
                 value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
+                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               >
-                {TASK_STATUSES.map(status => (
-                  <option key={status} value={status}>{status}</option>
+                {availableColumns.map(column => (
+                  <option key={column.id} value={column.name}>{column.name}</option>
                 ))}
               </select>
             </div>
