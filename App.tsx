@@ -63,7 +63,7 @@ const AppContent: React.FC = () => {
   return (
     <div className="flex flex-col h-screen text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">
       <Routes>
-        <Route path="/" element={<Navigate to="/workspaces" replace />} />
+        <Route path="/" element={<DefaultRedirect />} />
         <Route path="/workspaces" element={<WorkspaceSelectorPage />} />
         <Route path="/workspace/:workspaceId" element={<WorkspaceLayout />} />
         <Route path="/workspace/:workspaceId/reports" element={<WorkspaceLayout />} />
