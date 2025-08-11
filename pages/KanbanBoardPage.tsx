@@ -412,6 +412,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
                     onTaskClick={handleTaskClick}
                     isStandupActive={isStandupModeActive}
                     currentSpeakerId={currentSpeakerId}
+                    selectedMemberId={selectedMemberId}
                   />
                 ))}
               </SortableContext>
