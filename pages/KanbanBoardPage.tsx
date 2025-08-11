@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { collection, query, where, getDocs, getDoc, onSnapshot, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { db } from '../src/lib/firebase';
-import { TASK_STATUSES } from '../constants';
+import { DEFAULT_KANBAN_COLUMNS } from '../constants';
 import KanbanColumn from '../components/kanban/KanbanColumn';
-import type { Task, TaskStatus, Team, User } from '../types';
+import type { Task, TaskStatus, Team, User, KanbanColumn } from '../types';
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
 import { createPortal } from 'react-dom';
@@ -11,8 +11,9 @@ import TaskCard from '../components/ui/TaskCard';
 import TaskDetailModal from '../components/kanban/TaskDetailModal';
 import StandupControls from '../components/kanban/StandupControls';
 import MemberManagementModal from '../components/kanban/MemberManagementModal';
+import ColumnManagementModal from '../components/kanban/ColumnManagementModal';
 import TaskCreationModal from '../components/ui/TaskCreationModal';
-import { PlayCircle, X, Users, Settings, Plus } from 'lucide-react';
+import { PlayCircle, X, Users, Settings, Plus, Layout } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
 import MemberSelectionRow from '../components/ui/MemberSelectionRow';
 
@@ -30,6 +31,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [showSprintGoalModal, setShowSprintGoalModal] = useState(false);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [showColumnModal, setShowColumnModal] = useState(false);
   const [standupError, setStandupError] = useState<{
     title: string;
     message: string;
@@ -46,6 +48,9 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
 
   // Member Selection State
   const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
+
+  // Column Management State
+  const [kanbanColumns, setKanbanColumns] = useState<KanbanColumn[]>(DEFAULT_KANBAN_COLUMNS);
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -94,7 +99,15 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
 
     const unsubscribe = onSnapshot(doc(db, 'workspaces', workspaceId), (doc) => {
       if (doc.exists()) {
-        setWorkspace({ id: doc.id, ...doc.data() });
+        const workspaceData = { id: doc.id, ...doc.data() };
+        setWorkspace(workspaceData);
+
+        // Set kanban columns from workspace or use defaults
+        if (workspaceData.kanbanColumns && workspaceData.kanbanColumns.length > 0) {
+          setKanbanColumns(workspaceData.kanbanColumns);
+        } else {
+          setKanbanColumns(DEFAULT_KANBAN_COLUMNS);
+        }
       }
     });
 
@@ -155,11 +168,11 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
       ? tasks.filter(task => task.team === standupTeam)
       : tasks;
 
-    return TASK_STATUSES.reduce((acc, status) => {
-      acc[status] = relevantTasks.filter((task) => task.status === status);
+    return kanbanColumns.reduce((acc, column) => {
+      acc[column.name] = relevantTasks.filter((task) => task.status === column.name);
       return acc;
     }, {} as Record<TaskStatus, Task[]>);
-  }, [tasks, isStandupModeActive, standupTeam]);
+  }, [tasks, isStandupModeActive, standupTeam, kanbanColumns]);
   
   const handleDragStart = (event: DragStartEvent) => {
      if (isStandupModeActive) return;
@@ -187,8 +200,8 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
 
     // Determine the new status from the drop location (either a column or another task's column)
     const overIsAColumn = over.data.current?.type === 'COLUMN';
-    const newStatus = overIsAColumn 
-        ? (over.id as TaskStatus) 
+    const newStatus = overIsAColumn
+        ? kanbanColumns.find(col => col.id === over.id)?.name || (over.id as TaskStatus)
         : (over.data.current?.task.status as TaskStatus);
 
     setTasks((currentTasks) => {
@@ -200,7 +213,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
       updatedTasks[activeTaskIndex] = {
         ...updatedTasks[activeTaskIndex],
         status: newStatus,
-        ...(newStatus === 'Done' && !updatedTasks[activeTaskIndex].completedAt && { completedAt: new Date().toISOString() })
+        ...(kanbanColumns[kanbanColumns.length - 1]?.name === newStatus && !updatedTasks[activeTaskIndex].completedAt && { completedAt: new Date().toISOString() })
       };
       return updatedTasks;
     });
@@ -352,6 +365,13 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
                   <span>Üyeleri Yönet</span>
                 </button>
                 <button
+                  onClick={() => setShowColumnModal(true)}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                >
+                  <Layout className="h-4 w-4" />
+                  <span>Kolonları Yönet</span>
+                </button>
+                <button
                   onClick={() => setIsTeamSelectOpen(true)}
                   className="flex items-center space-x-2 px-3 py-2 md:px-4 text-sm md:text-base bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
@@ -386,12 +406,13 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
         ) : (
           <main className="flex-grow p-4 overflow-x-auto">
             <div className="flex space-x-4 h-full">
-              <SortableContext items={TASK_STATUSES}>
-                {TASK_STATUSES.map((status) => (
+              <SortableContext items={kanbanColumns.map(col => col.id)}>
+                {kanbanColumns.map((column) => (
                   <KanbanColumn
-                    key={status}
-                    title={status}
-                    tasks={tasksByStatus[status] || []}
+                    key={column.id}
+                    columnId={column.id}
+                    title={column.name}
+                    tasks={tasksByStatus[column.name] || []}
                     onTaskClick={handleTaskClick}
                     isStandupActive={isStandupModeActive}
                     currentSpeakerId={currentSpeakerId}
@@ -439,6 +460,17 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
               // Assuming it's meant to refetch users or workspace data.
               // For now, we'll just close the modal as a placeholder.
             }
+          }}
+        />
+      )}
+
+      {showColumnModal && (
+        <ColumnManagementModal
+          workspaceId={workspaceId}
+          columns={kanbanColumns}
+          onClose={() => setShowColumnModal(false)}
+          onColumnsUpdated={(updatedColumns) => {
+            setKanbanColumns(updatedColumns);
           }}
         />
       )}
