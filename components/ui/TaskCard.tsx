@@ -9,15 +9,29 @@ interface TaskCardProps {
   onClick: () => void;
   isOverlay?: boolean;
   isFaded?: boolean;
+  isFocused?: boolean;
+  isBlurred?: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, isOverlay = false, isFaded = false }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, isOverlay = false, isFaded = false, isFocused = false, isBlurred = false }) => {
   const teamColor = TEAM_COLORS[task.team] || 'bg-gray-200 text-gray-800';
-  
-  const cardStyles = `bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${isOverlay ? 'shadow-2xl scale-105 rotate-3' : ''} ${isFaded ? 'opacity-30' : 'opacity-100'}`;
+
+  let cardStyles = 'bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md border border-gray-200 dark:border-gray-700 cursor-pointer transition-all duration-300';
+
+  if (isOverlay) {
+    cardStyles += ' shadow-2xl scale-105 rotate-3';
+  } else if (isFocused) {
+    cardStyles += ' shadow-2xl border-indigo-500 dark:border-indigo-400 ring-4 ring-indigo-200 dark:ring-indigo-800 scale-105 hover:scale-105 animate-pulse';
+  } else if (isBlurred) {
+    cardStyles += ' opacity-30 hover:opacity-50';
+  } else if (isFaded) {
+    cardStyles += ' opacity-30';
+  } else {
+    cardStyles += ' hover:shadow-lg hover:-translate-y-1 opacity-100';
+  }
 
   return (
-    <div className={cardStyles} onClick={onClick}>
+    <div className={cardStyles} onClick={onClick} style={isFocused ? { background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05))' } : {}}>
       <div className="flex justify-between items-start">
         <h3 className="font-bold text-gray-800 dark:text-gray-100 pr-2">{task.title}</h3>
         {task.dependencies.length > 0 && (
