@@ -17,53 +17,79 @@ class AIService {
   }
 
   private async makeAIRequest(prompt: string): Promise<string> {
+    console.log('🔍 AI Request başlatılıyor...');
+    console.log('🔑 API Key var mı:', !!this.apiKey);
+    console.log('🔑 API Key uzunluğu:', this.apiKey ? this.apiKey.length : 0);
+    console.log('🌐 Base URL:', this.baseUrl);
+    
     if (!this.apiKey) {
       throw new Error('AI API key bulunamadı. Lütfen VITE_AI_API_KEY environment variable\'ını ayarlayın.');
     }
 
     try {
+      console.log('📡 API çağrısı yapılıyor...');
+      const requestBody = {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'Sen deneyimli bir Scrum Master ve yazılım geliştiricisisin. Türkçe yanıt ver.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 500,
+        temperature: 0.7
+      };
+      
+      console.log('📤 Request body:', requestBody);
+      
       const response = await fetch(this.baseUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.apiKey}`
         },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'Sen deneyimli bir Scrum Master ve yazılım geliştiricisisin. Türkçe yanıt ver.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: 500,
-          temperature: 0.7
-        })
+        body: JSON.stringify(requestBody)
       });
 
+      console.log('📥 Response status:', response.status);
+      console.log('📥 Response headers:', response.headers);
+
       if (!response.ok) {
-        throw new Error(`AI API hatası: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ Response error:', errorText);
+        throw new Error(`AI API hatası: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('✅ Response data:', data);
       return data.choices[0]?.message?.content || '';
     } catch (error) {
-      console.error('AI API çağrısı hatası:', error);
-      throw new Error('AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.');
+      console.error('❌ AI API çağrısı hatası:', error);
+      
+      // İnternet bağlantısı kontrolü
+      if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        throw new Error('İnternet bağlantınızı kontrol edin ve tekrar deneyin.');
+      }
+      
+      throw new Error(`AI servisi hatası: ${error instanceof Error ? error.message : 'Bilinmeyen hata'}`);
     }
   }
 
-  async generateTaskDescription(title: string): Promise<AITaskDescriptionResponse> {
-    const prompt = `Sen deneyimli bir Scrum Master'sın. Görev başlığı '${title}' için aşağıdaki formatı kullanarak yanıt ver:
+                async generateTaskDescription(title: string): Promise<AITaskDescriptionResponse> {
+                const prompt = `Sen deneyimli bir Scrum Master ve yazılım geliştiricisisin. 
 
-1. User Story (Kullanıcı Hikayesi): "As a..., I want to..., so that..." formatında
-2. Acceptance Criteria (Kabul Kriterleri): 3-5 adet madde halinde
+            Eğer kullanıcı bir görev oluşturmak istiyorsa:
+            1. User Story (Kullanıcı Hikayesi): "As a..., I want to..., so that..." formatında
+            2. Acceptance Criteria (Kabul Kriterleri): 3-5 adet madde halinde
 
-Sadece bu iki bölümü içeren net bir yanıt ver. Ekstra açıklama ekleme.`;
+            Eğer kullanıcı genel bir soru soruyorsa (süre, öneri, ipucu):
+            Direkt ve pratik cevap ver, User Story formatına çevirme.
+
+            Sadece gerekli bilgileri ver, ekstra açıklama ekleme.`;
 
     try {
       const response = await this.makeAIRequest(prompt);

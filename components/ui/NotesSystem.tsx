@@ -23,6 +23,19 @@ import {
   Settings,
   FileText
 } from 'lucide-react';
+import { 
+  doc, 
+  setDoc, 
+  getDoc, 
+  collection, 
+  query, 
+  where, 
+  getDocs, 
+  deleteDoc,
+  orderBy,
+  onSnapshot
+} from 'firebase/firestore';
+import { db } from '../../src/lib/firebase';
 
 interface NotesSystemProps {
   workspaceId: string;
@@ -44,12 +57,35 @@ const NotesSystem: React.FC<NotesSystemProps> = ({ workspaceId, tasks = [], spri
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [showPublicOnly, setShowPublicOnly] = useState(false);
 
-  // Mock data - gerçek uygulamada Firebase'den gelecek
+  // Load notes from Firestore
   useEffect(() => {
-    // Workspace'e ait notları filtrele
-    const workspaceNotes = mockNotes.filter(note => note.workspaceId === workspaceId);
-    setNotes(workspaceNotes);
-  }, [workspaceId]);
+    if (!workspaceId || !currentUser) return;
+
+    console.log('Loading notes for workspace:', workspaceId);
+    
+    // Real-time listener for notes
+    const notesQuery = query(
+      collection(db, 'notes'),
+      where('workspaceId', '==', workspaceId),
+      orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(notesQuery, (snapshot) => {
+      const notesData: Note[] = [];
+      snapshot.forEach((doc) => {
+        notesData.push({ id: doc.id, ...doc.data() } as Note);
+      });
+      console.log('Notes loaded from Firestore:', notesData.length);
+      setNotes(notesData);
+    }, (error) => {
+      console.error('Error loading notes:', error);
+      // Fallback to mock data if Firestore fails
+      const workspaceNotes = mockNotes.filter(note => note.workspaceId === workspaceId);
+      setNotes(workspaceNotes);
+    });
+
+    return () => unsubscribe();
+  }, [workspaceId, currentUser]);
 
   useEffect(() => {
     filterAndSortNotes();
@@ -108,11 +144,21 @@ const NotesSystem: React.FC<NotesSystemProps> = ({ workspaceId, tasks = [], spri
     setIsEditModalOpen(true);
   };
 
-  const handleDeleteNote = (noteId: string) => {
+  const handleDeleteNote = async (noteId: string) => {
     if (window.confirm('Bu notu silmek istediğinizden emin misiniz?')) {
-      setNotes(notes.filter(note => note.id !== noteId));
-      if (selectedNote?.id === noteId) {
-        setSelectedNote(null);
+      try {
+        // Delete from Firestore
+        await deleteDoc(doc(db, 'notes', noteId));
+        console.log('Note deleted from Firestore:', noteId);
+        
+        // Update local state
+        setNotes(notes.filter(note => note.id !== noteId));
+        if (selectedNote?.id === noteId) {
+          setSelectedNote(null);
+        }
+      } catch (error) {
+        console.error('Error deleting note from Firestore:', error);
+        alert('Not silinirken hata oluştu. Lütfen tekrar deneyin.');
       }
     }
   };
@@ -449,32 +495,51 @@ const NotesSystem: React.FC<NotesSystemProps> = ({ workspaceId, tasks = [], spri
             setIsEditModalOpen(false);
             setSelectedNote(null);
           }}
-                       onSave={(noteData) => {
-               if (isEditModalOpen && selectedNote) {
-                 // Edit existing note
-                 setNotes(notes.map(n => n.id === selectedNote.id ? { ...n, ...noteData, updatedAt: new Date().toISOString() } : n));
-               } else {
-                 // Create new note
-                 const newNote: Note = {
-                   title: noteData.title!,
-                   content: noteData.content!,
-                   tags: noteData.tags || [],
-                   category: noteData.category || 'General',
-                   isPublic: noteData.isPublic ?? true,
-                   relatedTasks: noteData.relatedTasks || [],
-                   relatedSprints: noteData.relatedSprints || [],
-                   id: Date.now().toString(),
-                   workspaceId,
-                   authorId: currentUser?.uid || '',
-                   authorName: currentUser?.displayName || 'User',
-                   createdAt: new Date().toISOString(),
-                   updatedAt: new Date().toISOString(),
-                 };
-                 setNotes([newNote, ...notes]);
+                       onSave={async (noteData) => {
+               try {
+                 if (isEditModalOpen && selectedNote) {
+                   // Edit existing note
+                   const updatedNote = { 
+                     ...selectedNote, 
+                     ...noteData, 
+                     updatedAt: new Date().toISOString() 
+                   };
+                   
+                   // Save to Firestore
+                   await setDoc(doc(db, 'notes', selectedNote.id), updatedNote);
+                   console.log('Note updated in Firestore:', selectedNote.id);
+                   
+                 } else {
+                   // Create new note
+                   const newNote: Note = {
+                     title: noteData.title!,
+                     content: noteData.content!,
+                     tags: noteData.tags || [],
+                     category: noteData.category || 'General',
+                     isPublic: noteData.isPublic ?? true,
+                     relatedTasks: noteData.relatedTasks || [],
+                     relatedSprints: noteData.relatedSprints || [],
+                     id: Date.now().toString(),
+                     workspaceId,
+                     authorId: currentUser?.uid || '',
+                     authorName: currentUser?.displayName || 'User',
+                     createdAt: new Date().toISOString(),
+                     updatedAt: new Date().toISOString(),
+                   };
+                   
+                   // Save to Firestore
+                   await setDoc(doc(db, 'notes', newNote.id), newNote);
+                   console.log('Note saved to Firestore:', newNote.id);
+                 }
+                 
+                 setIsCreateModalOpen(false);
+                 setIsEditModalOpen(false);
+                 setSelectedNote(null);
+                 
+               } catch (error) {
+                 console.error('Error saving note to Firestore:', error);
+                 alert('Not kaydedilirken hata oluştu. Lütfen tekrar deneyin.');
                }
-               setIsCreateModalOpen(false);
-               setIsEditModalOpen(false);
-               setSelectedNote(null);
              }}
           tasks={tasks}
           sprints={sprints}

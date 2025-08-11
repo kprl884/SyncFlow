@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Bot, Send, Loader2, X } from 'lucide-react';
-import { geminiService } from '../../src/lib/gemini';
+import { aiService } from '../../src/lib/ai-service';
 
 interface AIAssistantProps {
   workspaceId?: string;
@@ -29,15 +29,30 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ workspaceId, onTaskSuggestion
     try {
       let aiResponse: string;
       
-      // Handle different types of requests
-      if (userMessage.toLowerCase().includes('task suggestion') || userMessage.toLowerCase().includes('suggest')) {
-        aiResponse = await geminiService.generateTaskSuggestions(`Workspace ID: ${workspaceId || 'General'}`);
-      } else if (userMessage.toLowerCase().includes('description') || userMessage.toLowerCase().includes('describe')) {
-        aiResponse = await geminiService.generateTaskDescription(userMessage);
-      } else {
-        // General conversation
-        aiResponse = await geminiService.generateContent(userMessage);
-      }
+                          // Handle different types of requests
+                    if (userMessage.toLowerCase().includes('task suggestion') || userMessage.toLowerCase().includes('suggest')) {
+                      const result = await aiService.generateTaskDescription(userMessage);
+                      aiResponse = `Görev Önerisi:\n\n${result.userStory}\n\nKabul Kriterleri:\n${result.acceptanceCriteria.map(criteria => `• ${criteria}`).join('\n')}`;
+                    } else if (userMessage.toLowerCase().includes('description') || userMessage.toLowerCase().includes('describe')) {
+                      const result = await aiService.generateTaskDescription(userMessage);
+                      aiResponse = `Görev Açıklaması:\n\n${result.userStory}\n\nKabul Kriterleri:\n${result.acceptanceCriteria.map(criteria => `• ${criteria}`).join('\n')}`;
+                    } else {
+                      // General conversation - check if it's a task creation or general question
+                      const isTaskCreation = userMessage.toLowerCase().includes('oluştur') || 
+                                           userMessage.toLowerCase().includes('yap') || 
+                                           userMessage.toLowerCase().includes('ekle') ||
+                                           userMessage.toLowerCase().includes('task') ||
+                                           userMessage.toLowerCase().includes('görev');
+                      
+                      if (isTaskCreation) {
+                        const result = await aiService.generateTaskDescription(userMessage);
+                        aiResponse = `Görev Açıklaması:\n\n${result.userStory}\n\nKabul Kriterleri:\n${result.acceptanceCriteria.map(criteria => `• ${criteria}`).join('\n')}`;
+                      } else {
+                        // General question - get direct answer
+                        const result = await aiService.generateTaskDescription(userMessage);
+                        aiResponse = `Yanıt:\n\n${result.userStory}`;
+                      }
+                    }
 
       // Add AI response to conversation
       setConversation([...newConversation, { role: 'assistant', content: aiResponse }]);
@@ -48,21 +63,27 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ workspaceId, onTaskSuggestion
         onTaskSuggestion(aiResponse);
       }
     } catch (error) {
-      console.error('AI Assistant Error:', error);
+      console.error('❌ AI Assistant Error:', error);
       
       let errorMessage = 'Üzgünüm, bir hata oluştu. Lütfen tekrar deneyin.';
       
       // Daha spesifik hata mesajları
       if (error instanceof Error) {
+        console.log('🔍 Error message:', error.message);
         if (error.message.includes('network') || error.message.includes('fetch')) {
           errorMessage = 'İnternet bağlantınızı kontrol edin ve tekrar deneyin.';
         } else if (error.message.includes('timeout')) {
           errorMessage = 'İstek zaman aşımına uğradı. Lütfen tekrar deneyin.';
         } else if (error.message.includes('quota') || error.message.includes('limit')) {
           errorMessage = 'API limiti aşıldı. Lütfen daha sonra tekrar deneyin.';
+        } else if (error.message.includes('İnternet bağlantınızı kontrol edin')) {
+          errorMessage = '🌐 İnternet bağlantınızı kontrol edin ve tekrar deneyin.';
+        } else if (error.message.includes('AI servisi hatası')) {
+          errorMessage = `AI Servis Hatası: ${error.message}`;
         }
       }
       
+      console.log('📝 Error message to user:', errorMessage);
       setConversation([...newConversation, { role: 'assistant', content: errorMessage }]);
       setResponse(errorMessage);
     } finally {
@@ -131,12 +152,12 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ workspaceId, onTaskSuggestion
 
             {/* Conversation Area */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {conversation.length === 0 && (
-                <div className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  <Bot className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>Merhaba! Size nasıl yardımcı olabilirim?</p>
-                </div>
-              )}
+                          {conversation.length === 0 && (
+              <div className="text-center text-gray-500 dark:text-gray-400 py-8">
+                <Bot className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>Merhaba! Size nasıl yardımcı olabilirim?</p>
+              </div>
+            )}
               
               {conversation.map((message, index) => (
                 <div
