@@ -9,12 +9,13 @@ interface TaskCardProps {
   onClick: () => void;
   isOverlay?: boolean;
   isFaded?: boolean;
+  isSelectedMemberTask?: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, isOverlay = false, isFaded = false }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onClick, isOverlay = false, isFaded = false, isSelectedMemberTask = false }) => {
   const teamColor = TEAM_COLORS[task.team] || 'bg-gray-200 text-gray-800';
   
-  const cardStyles = `bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${isOverlay ? 'shadow-2xl scale-105 rotate-3' : ''} ${isFaded ? 'opacity-30' : 'opacity-100'}`;
+  const cardStyles = `bg-white dark:bg-gray-800 rounded-lg p-4 shadow-md border border-gray-200 dark:border-gray-700 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${isOverlay ? 'shadow-2xl scale-105 rotate-3' : ''} ${isFaded ? 'opacity-30' : 'opacity-100'} ${isSelectedMemberTask ? 'ring-2 ring-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 border-indigo-300 dark:border-indigo-600' : ''}`;
 
   return (
     <div className={cardStyles} onClick={onClick}>

@@ -9,9 +9,10 @@ interface SortableTaskCardProps {
   onTaskClick: (task: Task) => void;
   isStandupActive?: boolean;
   currentSpeakerId?: string | null;
+  selectedMemberId?: string | null;
 }
 
-const SortableTaskCard: React.FC<SortableTaskCardProps> = ({ task, onTaskClick, isStandupActive, currentSpeakerId }) => {
+const SortableTaskCard: React.FC<SortableTaskCardProps> = ({ task, onTaskClick, isStandupActive, currentSpeakerId, selectedMemberId }) => {
   const {
     attributes,
     listeners,
@@ -34,10 +35,17 @@ const SortableTaskCard: React.FC<SortableTaskCardProps> = ({ task, onTaskClick, 
   };
 
   const isFaded = isStandupActive && task.assignee?.id !== currentSpeakerId;
+  const isSelectedMemberTask = selectedMemberId && task.assignee?.id === selectedMemberId;
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <TaskCard task={task} onClick={() => onTaskClick(task)} isOverlay={isDragging} isFaded={isFaded} />
+      <TaskCard 
+        task={task} 
+        onClick={() => onTaskClick(task)} 
+        isOverlay={isDragging} 
+        isFaded={isFaded}
+        isSelectedMemberTask={isSelectedMemberTask}
+      />
     </div>
   );
 };

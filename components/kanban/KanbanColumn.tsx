@@ -9,9 +9,10 @@ interface KanbanColumnProps {
   onTaskClick: (task: Task) => void;
   isStandupActive?: boolean;
   currentSpeakerId?: string | null;
+  selectedMemberId?: string | null;
 }
 
-const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, tasks, onTaskClick, isStandupActive, currentSpeakerId }) => {
+const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, tasks, onTaskClick, isStandupActive, currentSpeakerId, selectedMemberId }) => {
   const { setNodeRef } = useSortable({
     id: title,
     data: {
@@ -39,6 +40,7 @@ const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, tasks, onTaskClick, 
                   onTaskClick={onTaskClick}
                   isStandupActive={isStandupActive}
                   currentSpeakerId={currentSpeakerId}
+                  selectedMemberId={selectedMemberId}
                 />
               ))}
            </SortableContext>

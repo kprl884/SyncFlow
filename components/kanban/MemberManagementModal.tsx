@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../src/lib/firebase';
 import { useAuth } from '../../src/context/AuthContext';
 import { User, UserRole } from '../../types';
@@ -31,25 +31,69 @@ const MemberManagementModal: React.FC<MemberManagementModalProps> = ({
   const fetchWorkspaceUsers = async () => {
     if (!workspace) return;
 
-    const userIds = Object.keys(workspace.members);
+    console.log('🔍 fetchWorkspaceUsers başladı');
+    console.log('📋 Workspace data:', workspace);
+    console.log('👥 Workspace members:', workspace.members);
+    
+    const userIds = Object.keys(workspace.members || {});
+    console.log('🆔 User IDs found:', userIds);
+    
+    // Mock data'dan user bilgilerini al
+    const mockUsers = [
+      { id: 'user-1', name: 'Alex Johnson', email: 'alex@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-2', name: 'Sarah Chen', email: 'sarah@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-3', name: 'Mike Rodriguez', email: 'mike@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-4', name: 'Emily Davis', email: 'emily@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-5', name: 'David Kim', email: 'david@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-6', name: 'Lisa Wang', email: 'lisa@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face' }
+    ];
+    
     const usersData: User[] = [];
     
     for (const userId of userIds) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', userId));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
+      // Önce mock data'dan ara
+      const mockUser = mockUsers.find(u => u.id === userId);
+      if (mockUser) {
+        console.log(`✅ Mock user found:`, mockUser);
+        usersData.push(mockUser);
+      } else {
+        // Mock data'da yoksa, gerçek Firebase user ID'leri için fallback
+        console.log(`🔍 Fetching user from Firebase: ${userId}`);
+        try {
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            console.log(`✅ Firebase user found:`, userData);
+            usersData.push({
+              id: userId,
+              name: userData.displayName || userData.name || 'Unknown User',
+              email: userData.email,
+              avatarUrl: userData.photoURL || userData.avatarUrl
+            });
+          } else {
+            console.log(`❌ User not found: ${userId}`);
+            // Fallback: Generate a basic user object
+            usersData.push({
+              id: userId,
+              name: `User ${userId.slice(0, 8)}`,
+              email: 'email@unknown.com',
+              avatarUrl: undefined
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching user:', error);
+          // Error durumunda da fallback user oluştur
           usersData.push({
             id: userId,
-            name: userData.displayName || 'Unknown User',
-            avatarUrl: userData.photoURL
+            name: `User ${userId.slice(0, 8)}`,
+            email: 'email@unknown.com',
+            avatarUrl: undefined
           });
         }
-      } catch (error) {
-        console.error('Error fetching user:', error);
       }
     }
     
+    console.log('📊 Final users data:', usersData);
     setWorkspaceUsers(usersData);
   };
 
@@ -61,18 +105,61 @@ const MemberManagementModal: React.FC<MemberManagementModalProps> = ({
     setInviteError('');
 
     try {
-      // Find user by email
+      // Önce Firebase'den email ile user ara
+      console.log(`🔍 Searching for user with email: ${inviteEmail.trim()}`);
+      
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where('email', '==', inviteEmail.trim()));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
-        setInviteError('Bu email adresi ile kayıtlı kullanıcı bulunamadı.');
+        // Firebase'de bulunamadıysa mock data'dan ara
+        console.log(`❌ User not found in Firebase, checking mock data...`);
+        
+        const mockUsers = [
+          { id: 'user-1', name: 'Alex Johnson', email: 'alex@syncflow.com' },
+          { id: 'user-2', name: 'Sarah Chen', email: 'sarah@syncflow.com' },
+          { id: 'user-3', name: 'Mike Rodriguez', email: 'mike@syncflow.com' },
+          { id: 'user-4', name: 'Emily Davis', email: 'emily@syncflow.com' },
+          { id: 'user-5', name: 'David Kim', email: 'david@syncflow.com' },
+          { id: 'user-6', name: 'Lisa Wang', email: 'lisa@syncflow.com' }
+        ];
+
+        const mockUser = mockUsers.find(u => u.email === inviteEmail.trim());
+        
+        if (!mockUser) {
+          setInviteError('Bu email adresi ile kayıtlı kullanıcı bulunamadı.');
+          return;
+        }
+
+        console.log(`✅ Mock user found: ${mockUser.name} (${mockUser.email})`);
+        const userId = mockUser.id;
+        
+        // Check if user is already a member
+        if (workspace.members[userId]) {
+          setInviteError('Bu kullanıcı zaten workspace üyesi.');
+          return;
+        }
+
+        // Add user to workspace
+        const workspaceRef = doc(db, 'workspaces', workspaceId);
+        await updateDoc(workspaceRef, {
+          [`members.${userId}`]: 'Member' as UserRole,
+          updatedAt: new Date().toISOString()
+        });
+
+        setInviteEmail('');
+        onMembersUpdated();
+        console.log('✅ Mock user successfully invited!');
         return;
       }
 
+      // Firebase'de user bulundu
       const userDoc = querySnapshot.docs[0];
       const userId = userDoc.id;
+      const userData = userDoc.data();
+
+      console.log(`✅ Firebase user found: ${userData.displayName || userData.name} (${userData.email})`);
 
       // Check if user is already a member
       if (workspace.members[userId]) {

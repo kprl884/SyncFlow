@@ -14,6 +14,7 @@ import MemberManagementModal from '../components/kanban/MemberManagementModal';
 import TaskCreationModal from '../components/ui/TaskCreationModal';
 import { PlayCircle, X, Users, Settings, Plus } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
+import MemberSelectionRow from '../components/ui/MemberSelectionRow';
 
 interface KanbanBoardPageProps {
   workspaceId: string;
@@ -42,6 +43,9 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   const [standupTeam, setStandupTeam] = useState<Team | null>(null);
   const [standupParticipants, setStandupParticipants] = useState<User[]>([]);
   const [isTeamSelectOpen, setIsTeamSelectOpen] = useState<boolean>(false);
+
+  // Member Selection State
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -270,6 +274,24 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   };
   // --- End of Stand-up Logic ---
 
+  // Keyboard navigation for standup mode
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (!isStandupModeActive) return;
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        cycleSpeaker('next');
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        cycleSpeaker('prev');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [isStandupModeActive, currentSpeakerId, standupParticipants]);
+
   const teams: Team[] = ['Backend', 'Frontend', 'Mobile', 'General'];
 
   return (
@@ -340,6 +362,20 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
             )}
           </div>
         </div>
+
+        {/* Member Selection Row */}
+        {workspace && users.length > 0 && (
+          <div className="px-4">
+            <MemberSelectionRow
+              users={users}
+              selectedUserId={selectedMemberId}
+              onUserSelect={setSelectedMemberId}
+              isStandupMode={isStandupModeActive}
+              currentSpeakerId={currentSpeakerId}
+            />
+          </div>
+        )}
+
         {loading ? (
           <div className="flex-grow flex items-center justify-center">
             <div className="text-center">
@@ -359,6 +395,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
                     onTaskClick={handleTaskClick}
                     isStandupActive={isStandupModeActive}
                     currentSpeakerId={currentSpeakerId}
+                    selectedMemberId={selectedMemberId}
                   />
                 ))}
               </SortableContext>

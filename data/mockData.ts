@@ -64,7 +64,12 @@ export const mockWorkspaces: Workspace[] = [
     id: 'workspace-1',
     name: 'SyncFlow Development',
     description: 'Main development workspace for SyncFlow project management tool',
-    members: [mockUsers[0], mockUsers[1], mockUsers[2], mockUsers[3]],
+    members: {
+      'user-1': 'Admin',
+      'user-2': 'Member',
+      'user-3': 'Member',
+      'user-4': 'Member'
+    },
     ownerId: 'user-1',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
@@ -76,7 +81,11 @@ export const mockWorkspaces: Workspace[] = [
     id: 'workspace-2',
     name: 'Mobile App Team',
     description: 'Mobile application development workspace',
-    members: [mockUsers[1], mockUsers[4], mockUsers[2]],
+    members: {
+      'user-2': 'Admin',
+      'user-5': 'Member',
+      'user-3': 'Member'
+    },
     ownerId: 'user-2',
     createdAt: '2024-01-15T00:00:00Z',
     updatedAt: '2024-01-15T00:00:00Z',
@@ -88,7 +97,12 @@ export const mockWorkspaces: Workspace[] = [
     id: 'workspace-3',
     name: 'DevOps & Infrastructure',
     description: 'DevOps, CI/CD, and infrastructure management workspace',
-    members: [mockUsers[0], mockUsers[4], mockUsers[3], mockUsers[5]],
+    members: {
+      'user-1': 'Admin',
+      'user-5': 'Member',
+      'user-4': 'Member',
+      'user-6': 'Member'
+    },
     ownerId: 'user-1',
     createdAt: '2024-01-20T00:00:00Z',
     updatedAt: '2024-01-20T00:00:00Z',
