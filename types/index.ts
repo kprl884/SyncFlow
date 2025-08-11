@@ -98,3 +98,109 @@ export interface NoteComment {
   createdAt: string;
   updatedAt: string;
 }
+
+// ===== RETROSPECTIVE SYSTEM TYPES =====
+
+export type RetroPhase = 'brainstorming' | 'voting' | 'discussion' | 'actionPlanning' | 'completed';
+
+export type RetroCategory = 'whatWentWell' | 'whatCouldImprove' | 'actionItems' | 'custom';
+
+export interface RetroTemplate {
+  id: string;
+  name: string;
+  description: string;
+  categories: {
+    id: string;
+    title: string;
+    description: string;
+    icon: string;
+  }[];
+  defaultSettings?: Partial<RetroSessionSettings>;
+}
+
+export interface RetroSessionSettings {
+  allowAnonymous: boolean;
+  allowPrivateNotes: boolean;
+  enableVoting: boolean;
+  maxVotesPerUser: number;
+  timerEnabled: boolean;
+  phaseDurations: {
+    brainstorming: number;
+    voting: number;
+    discussion: number;
+    actionPlanning: number;
+    completed: number;
+  };
+  enableGrouping: boolean;
+  autoAdvancePhases: boolean;
+}
+
+export interface RetroNote {
+  id: string;
+  sessionId: string;
+  content: string;
+  category: RetroCategory;
+  customCategory?: string;
+  authorId: string;
+  authorName: string;
+  isAnonymous: boolean;
+  isPrivate: boolean;
+  votes: number;
+  votedBy: string[]; // Array of user IDs who voted
+  createdAt: string;
+  updatedAt: string;
+  position?: { x: number; y: number };
+  groupId?: string;
+}
+
+export interface RetroActionItem {
+  id: string;
+  sessionId: string;
+  title: string;
+  description: string;
+  assigneeId?: string;
+  assigneeName?: string;
+  dueDate?: string;
+  priority: 'Low' | 'Medium' | 'High';
+  status: 'Open' | 'In Progress' | 'Completed';
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RetroSession {
+  id: string;
+  workspaceId: string;
+  title: string;
+  description?: string;
+  facilitatorId: string;
+  facilitatorName: string;
+  participants: RetroParticipant[];
+  template: RetroTemplate | string;
+  status: 'draft' | 'active' | 'completed';
+  currentPhase: RetroPhase;
+  notes: RetroNote[];
+  actionItems: RetroActionItem[];
+  settings: RetroSessionSettings;
+  duration: number; // in minutes
+  createdAt: string;
+  updatedAt: string;
+  startedAt?: string;
+  completedAt?: string;
+}
+
+export interface RetroParticipant {
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  role: 'facilitator' | 'participant' | 'observer';
+  joinedAt: string;
+  lastActivity: string;
+  isOnline: boolean;
+  permissions: {
+    canAddNotes: boolean;
+    canVote: boolean;
+    canEditNotes: boolean;
+    canDeleteNotes: boolean;
+    canManageSession: boolean;
+  };
+}

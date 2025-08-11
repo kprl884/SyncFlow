@@ -6,11 +6,14 @@ import WorkspaceSelectorPage from './src/pages/WorkspaceSelectorPage';
 import KanbanBoardPage from './pages/KanbanBoardPage';
 import ReportsPage from './pages/ReportsPage';
 import JiraIntegrationDemoPage from './pages/JiraIntegrationDemoPage';
+import RetroHistoryPage from './pages/RetroHistoryPage';
+import RetroCreatePage from './pages/RetroCreatePage';
+import RetroSessionPage from './pages/RetroSessionPage';
 import Avatar from './components/ui/Avatar';
 import AIAssistant from './components/ui/AIAssistant';
 import NotesSystem from './components/ui/NotesSystem';
 import { mockTasks, mockSprints } from './data/mockData';
-import { AreaChart, KanbanSquare, LogOut, ArrowLeft, BookOpen, Settings } from 'lucide-react';
+import { AreaChart, KanbanSquare, LogOut, ArrowLeft, BookOpen, Settings, MessageSquare } from 'lucide-react';
 
 const App: React.FC = () => {
   return (
@@ -55,17 +58,32 @@ const AppContent: React.FC = () => {
         <Route path="/workspaces" element={<WorkspaceSelectorPage />} />
         <Route path="/workspace/:workspaceId" element={<WorkspaceLayout />} />
         <Route path="/workspace/:workspaceId/reports" element={<WorkspaceLayout />} />
+        <Route path="/workspace/:workspaceId/retros" element={<WorkspaceLayout />} />
+        <Route path="/workspace/:workspaceId/retros/new" element={<RetroCreatePageWrapper />} />
+        <Route path="/workspace/:workspaceId/retros/:sessionId" element={<RetroSessionPageWrapper />} />
         <Route path="/jira-integration" element={<JiraIntegrationDemoPage />} />
       </Routes>
     </div>
   );
 };
 
+const RetroCreatePageWrapper: React.FC = () => {
+  const { workspaceId } = useParams();
+  if (!workspaceId) return <div>Invalid workspace</div>;
+  return <RetroCreatePage workspaceId={workspaceId} />;
+};
+
+const RetroSessionPageWrapper: React.FC = () => {
+  const { workspaceId } = useParams();
+  if (!workspaceId) return <div>Invalid workspace</div>;
+  return <RetroSessionPage workspaceId={workspaceId} />;
+};
+
 const WorkspaceLayout: React.FC = () => {
   const { currentUser, signOutUser } = useAuth();
   const { workspaceId } = useParams();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState<'board' | 'reports' | 'notes'>('board');
+  const [currentPage, setCurrentPage] = useState<'board' | 'reports' | 'notes' | 'retros'>('board');
 
   const navItemClasses = "flex items-center space-x-2 px-4 py-2 rounded-md transition-colors duration-200 cursor-pointer";
   const activeNavItemClasses = "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-50";
@@ -100,6 +118,10 @@ const WorkspaceLayout: React.FC = () => {
                 <BookOpen className="h-5 w-5" />
                 <span>Notlar</span>
               </div>
+              <div onClick={() => setCurrentPage('retros')} className={`${navItemClasses} ${currentPage === 'retros' ? activeNavItemClasses : inactiveNavItemClasses}`}>
+                <MessageSquare className="h-5 w-5" />
+                <span>Retros</span>
+              </div>
             </nav>
             <div className="flex items-center space-x-3">
                <Avatar user={{ id: currentUser.uid, name: currentUser.displayName || 'User', avatarUrl: currentUser.photoURL || undefined }} />
@@ -118,6 +140,7 @@ const WorkspaceLayout: React.FC = () => {
         {currentPage === 'board' && <KanbanBoardPage workspaceId={workspaceId} />}
         {currentPage === 'reports' && <ReportsPage workspaceId={workspaceId} />}
         {currentPage === 'notes' && <NotesSystem workspaceId={workspaceId} tasks={mockTasks} sprints={mockSprints} />}
+        {currentPage === 'retros' && <RetroHistoryPage workspaceId={workspaceId} />}
       </main>
       
       {/* AI Assistant */}
