@@ -328,34 +328,6 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
               {isStandupModeActive && standupTeam ? `${standupTeam} Stand-up` : workspace?.name || "SyncFlow Board"}
             </h1>
             
-            {/* Member Filter */}
-            {!isStandupModeActive && workspace && users.length > 0 && (
-              <div className="mt-3 flex items-center space-x-3">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Üye Filtresi:
-                </label>
-                <select
-                  value={activeMemberFilter || ''}
-                  onChange={(e) => setActiveMemberFilter(e.target.value || null)}
-                  className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                >
-                  <option value="">Tüm Üyeler</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
-                    </option>
-                  ))}
-                </select>
-                {activeMemberFilter && (
-                  <button
-                    onClick={() => setActiveMemberFilter(null)}
-                    className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:underline"
-                  >
-                    Temizle
-                  </button>
-                )}
-              </div>
-            )}
             {/* Sprint Goal Banner */}
             {!isStandupModeActive && (
               <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
