@@ -182,6 +182,100 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                             updatedAt: new Date().toISOString()
                         });
                         console.log('Tech Nich workspace created');
+
+                        // Add sample tasks for testing
+                        const sampleTasks = [
+                            {
+                                title: 'Kullanıcı giriş sistemi geliştirme',
+                                description: 'OAuth entegrasyonu ve güvenlik özelliklerini içeren kullanıcı giriş sistemi',
+                                status: 'In Progress',
+                                assignee: {
+                                    id: TEST_USER_DATA.uid,
+                                    name: TEST_USER_DATA.displayName,
+                                    email: TEST_USER_DATA.email,
+                                    avatarUrl: TEST_USER_DATA.photoURL
+                                },
+                                workspaceId: TECH_NICH_WORKSPACE_ID,
+                                sprintId: 'sprint-001',
+                                storyPoints: 8,
+                                dependencies: [],
+                                team: 'Backend',
+                                tags: ['authentication', 'security', 'backend'],
+                                priority: 'High',
+                                createdAt: new Date().toISOString()
+                            },
+                            {
+                                title: 'Responsive dashboard tasarımı',
+                                description: 'Mobil ve desktop için optimize edilmiş kullanıcı dashboard arayüzü',
+                                status: 'Todo',
+                                assignee: {
+                                    id: TEST_USER_DATA.uid,
+                                    name: TEST_USER_DATA.displayName,
+                                    email: TEST_USER_DATA.email,
+                                    avatarUrl: TEST_USER_DATA.photoURL
+                                },
+                                workspaceId: TECH_NICH_WORKSPACE_ID,
+                                sprintId: 'sprint-001',
+                                storyPoints: 5,
+                                dependencies: [],
+                                team: 'Frontend',
+                                tags: ['ui', 'responsive', 'dashboard'],
+                                priority: 'Medium',
+                                createdAt: new Date().toISOString()
+                            },
+                            {
+                                title: 'API dokümantasyonu hazırlama',
+                                description: 'REST API endpoints için kapsamlı dokümantasyon ve örnek kullanımlar',
+                                status: 'Done',
+                                assignee: {
+                                    id: TEST_USER_DATA.uid,
+                                    name: TEST_USER_DATA.displayName,
+                                    email: TEST_USER_DATA.email,
+                                    avatarUrl: TEST_USER_DATA.photoURL
+                                },
+                                workspaceId: TECH_NICH_WORKSPACE_ID,
+                                sprintId: 'sprint-001',
+                                storyPoints: 3,
+                                dependencies: [],
+                                team: 'Backend',
+                                tags: ['documentation', 'api'],
+                                priority: 'Low',
+                                completedAt: new Date(Date.now() - 86400000).toISOString(),
+                                createdAt: new Date(Date.now() - 172800000).toISOString()
+                            },
+                            {
+                                title: 'Unit test coverage artırma',
+                                description: 'Kritik modüller için unit test coverage %90 üzerine çıkarma',
+                                status: 'Blocked',
+                                assignee: {
+                                    id: TEST_USER_DATA.uid,
+                                    name: TEST_USER_DATA.displayName,
+                                    email: TEST_USER_DATA.email,
+                                    avatarUrl: TEST_USER_DATA.photoURL
+                                },
+                                workspaceId: TECH_NICH_WORKSPACE_ID,
+                                sprintId: 'sprint-001',
+                                storyPoints: 13,
+                                dependencies: [],
+                                team: 'Backend',
+                                tags: ['testing', 'quality'],
+                                priority: 'High',
+                                isBlocked: true,
+                                blockerCategory: 'Technical Dependency',
+                                blockerDescription: 'Test framework setup gerekiyor',
+                                createdAt: new Date().toISOString()
+                            }
+                        ];
+
+                        try {
+                            const tasksRef = collection(db, 'workspaces', TECH_NICH_WORKSPACE_ID, 'tasks');
+                            for (const task of sampleTasks) {
+                                await addDoc(tasksRef, task);
+                            }
+                            console.log('Sample tasks added to Tech Nich workspace');
+                        } catch (error) {
+                            console.error('Error adding sample tasks:', error);
+                        }
                     } else {
                         // Update members to include test user
                         const currentData = workspaceDoc.data();
