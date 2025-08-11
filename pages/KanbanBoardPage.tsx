@@ -29,6 +29,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   const [showMemberModal, setShowMemberModal] = useState(false);
   const [showSprintGoalModal, setShowSprintGoalModal] = useState(false);
   const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+  const [activeMemberFilter, setActiveMemberFilter] = useState<string | null>(null);
   const [standupError, setStandupError] = useState<{
     title: string;
     message: string;
@@ -90,7 +91,8 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
 
     const unsubscribe = onSnapshot(doc(db, 'workspaces', workspaceId), (doc) => {
       if (doc.exists()) {
-        setWorkspace({ id: doc.id, ...doc.data() });
+        const workspaceData = { id: doc.id, ...doc.data() };
+        setWorkspace(workspaceData);
       }
     });
 
@@ -147,15 +149,28 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   }, [workspace]);
 
   const tasksByStatus = useMemo(() => {
-    const relevantTasks = isStandupModeActive && standupTeam
-      ? tasks.filter(task => task.team === standupTeam)
-      : tasks;
+    let relevantTasks = tasks;
+
+    // Apply team filter for standup mode
+    if (isStandupModeActive && standupTeam) {
+      relevantTasks = tasks.filter(task => task.team === standupTeam);
+    }
+
+    // Apply member filter
+    if (activeMemberFilter) {
+      relevantTasks = relevantTasks.filter(task => task.assignee?.id === activeMemberFilter);
+    }
+
+    // Apply current speaker filter for standup mode (intense focus)
+    if (isStandupModeActive && currentSpeakerId) {
+      relevantTasks = relevantTasks.filter(task => task.assignee?.id === currentSpeakerId);
+    }
 
     return TASK_STATUSES.reduce((acc, status) => {
       acc[status] = relevantTasks.filter((task) => task.status === status);
       return acc;
     }, {} as Record<TaskStatus, Task[]>);
-  }, [tasks, isStandupModeActive, standupTeam]);
+  }, [tasks, isStandupModeActive, standupTeam, activeMemberFilter, currentSpeakerId]);
   
   const handleDragStart = (event: DragStartEvent) => {
      if (isStandupModeActive) return;
@@ -289,6 +304,35 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
             <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">
               {isStandupModeActive && standupTeam ? `${standupTeam} Stand-up` : workspace?.name || "SyncFlow Board"}
             </h1>
+            
+            {/* Member Filter */}
+            {!isStandupModeActive && workspace && users.length > 0 && (
+              <div className="mt-3 flex items-center space-x-3">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Üye Filtresi:
+                </label>
+                <select
+                  value={activeMemberFilter || ''}
+                  onChange={(e) => setActiveMemberFilter(e.target.value || null)}
+                  className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                >
+                  <option value="">Tüm Üyeler</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+                {activeMemberFilter && (
+                  <button
+                    onClick={() => setActiveMemberFilter(null)}
+                    className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:underline"
+                  >
+                    Temizle
+                  </button>
+                )}
+              </div>
+            )}
             {/* Sprint Goal Banner */}
             {!isStandupModeActive && (
               <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
@@ -395,12 +439,15 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
           workspace={workspace}
           onClose={() => setShowMemberModal(false)}
           onMembersUpdated={() => {
-            // Refresh workspace data
+            // Refresh workspace data and users
             if (workspace) {
-              // The original code had a fetchWorkspaceUsers function here,
-              // but it's not defined in the provided context.
-              // Assuming it's meant to refetch users or workspace data.
-              // For now, we'll just close the modal as a placeholder.
+              // Force re-fetch of workspace data
+              const workspaceRef = doc(db, 'workspaces', workspaceId);
+              getDoc(workspaceRef).then((doc) => {
+                if (doc.exists()) {
+                  setWorkspace({ id: doc.id, ...doc.data() });
+                }
+              });
             }
           }}
         />

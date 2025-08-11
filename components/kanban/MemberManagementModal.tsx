@@ -28,25 +28,42 @@ const MemberManagementModal: React.FC<MemberManagementModalProps> = ({
     fetchWorkspaceUsers();
   }, [workspace]);
 
-  const fetchWorkspaceUsers = async () => {
+    const fetchWorkspaceUsers = async () => {
     if (!workspace) return;
 
-    const userIds = Object.keys(workspace.members);
+    const userIds = Object.keys(workspace.members || {});
     const usersData: User[] = [];
     
+    // Mock data'dan user bilgilerini al
+    const mockUsers = [
+      { id: 'user-1', name: 'Alex Johnson', email: 'alex@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-2', name: 'Sarah Chen', email: 'sarah@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-3', name: 'Mike Rodriguez', email: 'mike@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-4', name: 'Emily Davis', email: 'emily@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-5', name: 'David Kim', email: 'david@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face' },
+      { id: 'user-6', name: 'Lisa Wang', email: 'lisa@syncflow.com', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face' }
+    ];
+    
     for (const userId of userIds) {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', userId));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          usersData.push({
-            id: userId,
-            name: userData.displayName || 'Unknown User',
-            avatarUrl: userData.photoURL
-          });
+      const mockUser = mockUsers.find(u => u.id === userId);
+      if (mockUser) {
+        usersData.push(mockUser);
+      } else {
+        // Fallback to Firebase if mock user not found
+        try {
+          const userDoc = await getDoc(doc(db, 'users', userId));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            usersData.push({
+              id: userId,
+              name: userData.displayName || 'Unknown User',
+              email: userData.email || 'Email yok',
+              avatarUrl: userData.photoURL
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching user:', error);
         }
-      } catch (error) {
-        console.error('Error fetching user:', error);
       }
     }
     
@@ -217,22 +234,23 @@ const MemberManagementModal: React.FC<MemberManagementModalProps> = ({
                     className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg"
                   >
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
                         {user.avatarUrl ? (
                           <img
                             src={user.avatarUrl}
                             alt={user.name}
-                            className="w-8 h-8 rounded-full"
+                            className="w-10 h-10 rounded-full"
                           />
                         ) : (
-                          <UserIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+                          <UserIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                         )}
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="font-medium text-gray-900 dark:text-white">{user.name}</p>
-                        <div className="flex items-center space-x-2">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{user.email || 'Email yok'}</p>
+                        <div className="flex items-center space-x-2 mt-1">
                           {isOwner ? (
-                            <span className="flex items-center space-x-1 text-xs text-purple-600 dark:text-purple-400">
+                            <span className="flex items-center space-x-1 text-xs text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900 px-2 py-1 rounded-full">
                               <Crown className="h-3 w-3" />
                               <span>Owner</span>
                             </span>

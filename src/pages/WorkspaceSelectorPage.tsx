@@ -5,6 +5,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../context/AuthContext';
 import { Workspace } from '../../types';
 import { Plus, Users, Calendar, LogOut, Settings } from 'lucide-react';
+import MemberManagementModal from '../../components/kanban/MemberManagementModal';
 
 interface CreateWorkspaceModalProps {
   onClose: () => void;
@@ -111,6 +112,7 @@ const WorkspaceSelectorPage: React.FC = () => {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedWorkspaceForModal, setSelectedWorkspaceForModal] = useState<Workspace | null>(null);
   const { currentUser, signOutUser } = useAuth();
   const navigate = useNavigate();
 
@@ -239,7 +241,13 @@ const WorkspaceSelectorPage: React.FC = () => {
                 </p>
                 
                 <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center space-x-1">
+                  <div 
+                    className="flex items-center space-x-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedWorkspaceForModal(workspace);
+                    }}
+                  >
                     <Users className="h-4 w-4" />
                     <span>{Object.keys(workspace.members).length} üye</span>
                   </div>
@@ -275,6 +283,19 @@ const WorkspaceSelectorPage: React.FC = () => {
           onWorkspaceCreated={(workspaceId) => {
             setShowCreateModal(false);
             navigate(`/workspace/${workspaceId}`);
+          }}
+        />
+      )}
+
+      {/* Workspace Members Modal */}
+      {selectedWorkspaceForModal && (
+        <MemberManagementModal
+          workspaceId={selectedWorkspaceForModal.id}
+          workspace={selectedWorkspaceForModal}
+          onClose={() => setSelectedWorkspaceForModal(null)}
+          onMembersUpdated={() => {
+            // Refresh workspaces data
+            fetchUserWorkspaces();
           }}
         />
       )}
