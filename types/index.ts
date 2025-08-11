@@ -11,12 +11,19 @@ export type Team = 'Backend' | 'Frontend' | 'Mobile' | 'General';
 
 export type UserRole = 'Admin' | 'Member';
 
+export interface KanbanColumn {
+  id: string;
+  name: string;
+  order: number;
+}
+
 export interface Workspace {
   id: string;
   name: string;
   description?: string;
   ownerId: string;
   members: Record<string, UserRole>; // userId -> role mapping
+  kanbanColumns?: KanbanColumn[]; // Custom kanban columns
   createdAt: string; // ISO Date String
   updatedAt: string; // ISO Date String
 }
