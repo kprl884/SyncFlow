@@ -63,15 +63,6 @@ const AppContent: React.FC = () => {
 
   console.log('AppContent: User authenticated, showing main app');
 
-  // Auto-redirect test user to Tech Nich workspace
-  const savedWorkspace = localStorage.getItem('test-user-workspace');
-  const isTestUser = currentUser.uid === 'test-fatih-terim-001';
-
-  if (isTestUser && savedWorkspace && window.location.pathname === '/') {
-    window.location.href = `/workspace/${savedWorkspace}`;
-    return <LoadingSpinner />;
-  }
-
   return (
     <div className="flex flex-col h-screen text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">
       <Routes>
