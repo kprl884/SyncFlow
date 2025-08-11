@@ -4,6 +4,7 @@ import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-
 import SortableTaskCard from './SortableTaskCard';
 
 interface KanbanColumnProps {
+  columnId: string;
   title: TaskStatus;
   tasks: Task[];
   onTaskClick: (task: Task) => void;
@@ -12,9 +13,9 @@ interface KanbanColumnProps {
   selectedMemberId?: string | null;
 }
 
-const KanbanColumn: React.FC<KanbanColumnProps> = ({ title, tasks, onTaskClick, isStandupActive, currentSpeakerId, selectedMemberId }) => {
+const KanbanColumn: React.FC<KanbanColumnProps> = ({ columnId, title, tasks, onTaskClick, isStandupActive, currentSpeakerId, selectedMemberId }) => {
   const { setNodeRef } = useSortable({
-    id: title,
+    id: columnId,
     data: {
       type: 'COLUMN',
     }

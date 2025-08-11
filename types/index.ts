@@ -5,11 +5,17 @@ export interface User {
   avatarUrl?: string; // URL to the user's image
 }
 
-export type TaskStatus = 'Todo' | 'In Progress' | 'In Review' | 'Done';
+export type TaskStatus = string; // Now flexible to support any column name
 
 export type Team = 'Backend' | 'Frontend' | 'Mobile' | 'General';
 
 export type UserRole = 'Admin' | 'Member';
+
+export interface KanbanColumn {
+  id: string;
+  name: string;
+  order: number;
+}
 
 export interface Workspace {
   id: string;
@@ -17,6 +23,7 @@ export interface Workspace {
   description?: string;
   ownerId: string;
   members: Record<string, UserRole>; // userId -> role mapping
+  kanbanColumns?: KanbanColumn[]; // Custom kanban columns
   createdAt: string; // ISO Date String
   updatedAt: string; // ISO Date String
 }

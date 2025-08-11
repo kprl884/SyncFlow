@@ -1,7 +1,13 @@
+import type { TaskStatus, Team, KanbanColumn } from './types';
 
-import type { TaskStatus, Team } from './types';
+export const DEFAULT_KANBAN_COLUMNS: KanbanColumn[] = [
+  { id: 'todo', name: 'Todo', order: 0 },
+  { id: 'in-progress', name: 'In Progress', order: 1 },
+  { id: 'in-review', name: 'In Review', order: 2 },
+  { id: 'done', name: 'Done', order: 3 }
+];
 
-export const TASK_STATUSES: TaskStatus[] = ['Todo', 'In Progress', 'In Review', 'Done'];
+export const TASK_STATUSES: TaskStatus[] = DEFAULT_KANBAN_COLUMNS.map(col => col.name);
 
 export const TEAM_COLORS: Record<Team, string> = {
   Backend: 'bg-blue-200 text-blue-800',
