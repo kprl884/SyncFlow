@@ -228,14 +228,9 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   // --- Stand-up Mode Logic ---
   const startStandup = (team: Team) => {
     try {
-      const participantMap = new Map<string, User>();
-      tasks.forEach(task => {
-        if (task.team === team && task.assignee) {
-          participantMap.set(task.assignee.id, task.assignee);
-        }
-      });
-      const participants = Array.from(participantMap.values());
-      
+      // Get all workspace members instead of just assigned users
+      const participants = users.filter(user => user.id !== null);
+
       if (participants.length > 0) {
           setStandupTeam(team);
           setStandupParticipants(participants);
@@ -246,7 +241,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
           // Custom error dialog instead of alert
           setStandupError({
             title: 'Stand-up Başlatılamadı',
-            message: `${team} takımında atanmış kullanıcı bulunamadı. Stand-up başlatmak için önce görevlere kullanıcı atayın.`,
+            message: `Workspace'de üye bulunamadı. Stand-up başlatmak için önce workspace'e üye ekleyin.`,
             type: 'warning'
           });
           setIsTeamSelectOpen(false);
