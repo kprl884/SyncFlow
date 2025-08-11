@@ -14,6 +14,7 @@ import MemberManagementModal from '../components/kanban/MemberManagementModal';
 import TaskCreationModal from '../components/ui/TaskCreationModal';
 import { PlayCircle, X, Users, Settings, Plus } from 'lucide-react';
 import { useAuth } from '../src/context/AuthContext';
+import MemberSelectionRow from '../components/ui/MemberSelectionRow';
 
 interface KanbanBoardPageProps {
   workspaceId: string;
@@ -43,6 +44,9 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
   const [standupTeam, setStandupTeam] = useState<Team | null>(null);
   const [standupParticipants, setStandupParticipants] = useState<User[]>([]);
   const [isTeamSelectOpen, setIsTeamSelectOpen] = useState<boolean>(false);
+
+  // Member Selection State
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -277,6 +281,30 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
         : (currentIndex - 1 + standupParticipants.length) % standupParticipants.length;
 
     setCurrentSpeakerId(standupParticipants[nextIndex].id);
+  };
+
+  // Keyboard navigation for standup mode
+  useEffect(() => {
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (!isStandupModeActive) return;
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        cycleSpeaker('next');
+      } else if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        cycleSpeaker('prev');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [isStandupModeActive, currentSpeakerId, standupParticipants]);
+
+  // Handle member selection
+  const handleMemberSelect = (memberId: string | null) => {
+    setSelectedMemberId(memberId);
+    setActiveMemberFilter(memberId);
   };
   // --- End of Stand-up Logic ---
 
