@@ -445,6 +445,7 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
         users={users}
         workspaceId={workspaceId}
         existingTasks={tasks}
+        availableColumns={kanbanColumns}
       />
 
       {showMemberModal && (
