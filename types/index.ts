@@ -5,7 +5,7 @@ export interface User {
   avatarUrl?: string; // URL to the user's image
 }
 
-export type TaskStatus = 'Todo' | 'In Progress' | 'In Review' | 'Done';
+export type TaskStatus = string; // Now flexible to support any column name
 
 export type Team = 'Backend' | 'Frontend' | 'Mobile' | 'General';
 
