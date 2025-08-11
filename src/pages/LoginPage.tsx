@@ -63,6 +63,23 @@ const LoginPage: React.FC = () => {
                             </svg>
                             Sign in with GitHub
                         </button>
+
+                        {/* Development/Test Login */}
+                        <div className="border-t border-gray-200 dark:border-gray-600 pt-4 mt-4">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-3">
+                                🔧 Test & Development
+                            </p>
+                            <button
+                                onClick={signInWithTestUser}
+                                className="w-full flex justify-center items-center py-3 px-4 border-2 border-dashed border-orange-300 dark:border-orange-600 rounded-lg shadow-sm font-medium text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:focus:ring-offset-gray-800 transition-all duration-200 transform hover:scale-105"
+                                aria-label="Test Login as Fatih Terim"
+                            >
+                                <div className="w-6 h-6 mr-3 rounded-full bg-orange-500 flex items-center justify-center text-white text-sm font-bold">
+                                    FT
+                                </div>
+                                Fatih Terim olarak giriş yap (Test)
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
