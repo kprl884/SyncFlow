@@ -379,6 +379,20 @@ const KanbanBoardPage: React.FC<KanbanBoardPageProps> = ({ workspaceId }) => {
             )}
           </div>
         </div>
+
+        {/* Member Selection Row */}
+        {workspace && users.length > 0 && (
+          <div className="px-4">
+            <MemberSelectionRow
+              users={users}
+              selectedUserId={selectedMemberId}
+              onUserSelect={handleMemberSelect}
+              isStandupMode={isStandupModeActive}
+              currentSpeakerId={currentSpeakerId}
+            />
+          </div>
+        )}
+
         {loading ? (
           <div className="flex-grow flex items-center justify-center">
             <div className="text-center">
